@@ -24,29 +24,6 @@
         "MODEL_OVERRIDE": "${input:modelName}"
       }
     },
-    {
-      "name": "Debug azure-local-debug Tests",
-      "type": "node",
-      "request": "launch",
-      "cwd": "${workspaceFolder}/tests",
-      "runtimeExecutable": "node",
-      "runtimeArgs": [
-        "--experimental-vm-modules",
-        "${workspaceFolder}/tests/node_modules/.bin/jest",
-        "--runInBand",
-        "--no-cache",
-        "--testPathPatterns",
-        "azure-local-debug"
-      ],
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen",
-      "preLaunchTask": "build-skills",
-      "env": {
-        "NODE_OPTIONS": "--experimental-vm-modules",
-        "DEBUG": "1",
-        "SKIP_INTEGRATION_TESTS": "true"
-      }
-    }
   ],
   "inputs": [
     {
