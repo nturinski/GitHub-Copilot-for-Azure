@@ -1,5 +1,5 @@
 /**
- * Trigger Tests for azure-local-development
+ * Trigger Tests for azure-local-debug
  * 
  * Tests that verify the skill triggers on appropriate prompts
  * and does NOT trigger on unrelated prompts.
@@ -10,7 +10,7 @@
 import { TriggerMatcher } from "../utils/trigger-matcher";
 import { loadSkill, LoadedSkill } from "../utils/skill-loader";
 
-const SKILL_NAME = "azure-local-development";
+const SKILL_NAME = "azure-local-debug";
 
 const EXCLUDE_KEYWORDS = ["deploy", "deployment", "container", "terraform", "bicep", "security", "monitor", "Amazon", "AWS", "Google", "GCP"];
 const NOISY_KEYWORDS = ["project", "help", "build", "start"];

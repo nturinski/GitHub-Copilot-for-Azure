@@ -1,0 +1,16 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build-skills",
+      "type": "shell",
+      "command": "npx gulp",
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "revealProblems": "onProblem",
+        "close": true
+      }
+    }
+  ]
+}

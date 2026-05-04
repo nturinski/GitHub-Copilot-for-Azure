@@ -1,5 +1,5 @@
 ---
-name: azure-local-development
+name: azure-local-debug
 description: "Setup project configurations and local development environment so that the developer can start debugging from a single action. Guides installation of prerequisites, automates Azure emulator setup via docker-compose (Azurite, Postgres, Service Bus, etc.), provides IDE-specific debug/launch configs, and generates a local development API test collection for basic app verification. WHEN: \"local dev\", \"local development\", \"local dev setup\", \"local environment setup\", \"verify my project locally\", \"debug my project locally\", \"debug my project in VS Code\", \"launch.json\", \"tasks.json\", \"set up emulators\". DO NOT USE FOR: deploying to Azure (use azure-deploy), generating Terraform or Bicep (use azure-prepare), Amazon, AWS, Google, GCP, container diagnostics (use azure-diagnostics), security audits (use azure-compliance), monitoring (use appinsights-instrumentation)."
 license: MIT
 metadata:
@@ -7,7 +7,7 @@ metadata:
   version: "0.0.0-placeholder"
 ---
 
-# Azure Local Development
+# Azure Local Debug
 
 > **AUTHORITATIVE GUIDANCE — MANDATORY COMPLIANCE**
 >

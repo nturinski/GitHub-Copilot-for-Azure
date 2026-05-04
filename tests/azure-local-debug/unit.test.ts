@@ -1,12 +1,12 @@
 /**
- * Unit Tests for azure-local-development
+ * Unit Tests for azure-local-debug
  * 
  * Test isolated skill logic and validation rules.
  */
 
 import { loadSkill, LoadedSkill } from "../utils/skill-loader";
 
-const SKILL_NAME = "azure-local-development";
+const SKILL_NAME = "azure-local-debug";
 const AZURE_PROJECT_PLAN = ".azure/project-plan.md";
 const LOCAL_DEVELOPMENT_PLAN = ".azure/local-development-plan.md";
 

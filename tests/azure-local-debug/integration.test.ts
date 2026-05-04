@@ -1,5 +1,5 @@
 /**
- * Integration Tests for azure-local-development
+ * Integration Tests for azure-local-debug
  * 
  * Tests skill behavior with a real Copilot agent session.
  * Runs prompts multiple times to measure skill invocation rate.
@@ -23,7 +23,7 @@ import {
 } from "./utils";
 import * as path from "node:path";
 
-const SKILL_NAME = "azure-local-development";
+const SKILL_NAME = "azure-local-debug";
 const FOLLOW_UP_PROMPT = ["Continue with recommended options until complete."];
 
 const RUNS_PER_PROMPT = 3;
