@@ -1,13 +1,6 @@
 # Multi-Service Orchestration
 
-> **Phase 0b — runs only for multi-service workspaces or monorepos.**
-> Single-service workspaces skip this file entirely — the output of `classify.md` is a one-item array and all phases treat it identically.
-
----
-
-## When This Runs
-
-`classify.md` produces a `services[]` array. If the array has **more than one entry**, this phase runs between classify and inventory to assemble a shared workspace context before discovery begins.
+> `classify.md` produces a `services[]` array. If the array has **more than one entry**, this phase runs between classify and inventory to assemble a shared workspace context before discovery begins.
 
 ---
 

@@ -8,17 +8,16 @@
 
 For every detected project type, runtime, IDE, and emulator, follow this procedure **exactly**:
 
-1. **Normalize** the detected value to a canonical kebab-case ID (e.g., `Visual Studio` → `visual-studio`, `VS Code` → `vscode`, `Container App` → `container-app`, `python` → `python`).
-2. **Check file existence** — Look for `references/{category-folder}/{canonical-id}.md`. Ignore `_template.md`.
-3. **If the file exists** → the feature is fully supported. Proceed normally.
-4. **If the file does NOT exist** → the feature has limited support. You **MUST** emit a warning. Do NOT substitute a different, supported feature.
+1. **Check for a match** — List the files in the category folder (ignoring `_template.md`). If any filename loosely matches the detected value (ignoring case, spaces, dashes, and underscores), the feature is supported.
+2. **If a match exists** → the feature is fully supported. Proceed normally.
+3. **If no match exists** → the feature has limited support. You **MUST** emit a warning. Do NOT substitute a different, supported feature.
 
-| Category | Category Folder | Example canonical IDs |
-|----------|-----------------|----------------------|
-| Project type | `references/project-types/` | `functions`, `container-app`, `app-service` |
-| Runtime | `references/runtimes/` | `node`, `dotnet`, `python`, `java`, `go` |
-| IDE | `references/ide/` | `vscode`, `visual-studio`, `jetbrains` |
-| Emulator | `references/emulators/` | `azurite`, `cosmosdb`, `postgres` |
+| Category | Category Folder |
+|----------|-----------------|
+| Project type | `references/project-types/` |
+| Runtime | `references/runtimes/` |
+| IDE | `references/ide/` |
+| Emulator | `references/emulators/` |
 
 > ⚠️ **Do NOT skip this check.** Every detected feature MUST be verified against the category folder before proceeding. If you are unsure, list the files in the folder to confirm.
 

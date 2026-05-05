@@ -1,6 +1,6 @@
 ---
 name: azure-local-debug
-description: "Setup project configurations and local development environment so that the developer can start debugging from a single action. Guides installation of prerequisites, automates Azure emulator setup via docker-compose (Azurite, Postgres, Service Bus, etc.), provides IDE-specific debug/launch configs, and generates a local development API test collection for basic app verification. WHEN: \"local dev\", \"local development\", \"local dev setup\", \"local environment setup\", \"verify my project locally\", \"debug my project locally\", \"debug my project in VS Code\", \"launch.json\", \"tasks.json\", \"set up emulators\". DO NOT USE FOR: deploying to Azure (use azure-deploy), generating Terraform or Bicep (use azure-prepare), Amazon, AWS, Google, GCP, container diagnostics (use azure-diagnostics), security audits (use azure-compliance), monitoring (use appinsights-instrumentation)."
+description: "Setup project configurations and local development environment so that the developer can start debugging from a single action. Guides installation of prerequisites, automates Azure emulator setup via docker-compose (Azurite, Postgres, Service Bus, etc.), provides IDE-specific debug/launch configs, and generates a local development API test collection for basic app verification. WHEN: \"local debug\", \"debug my project locally\", \"debug my project in VS Code\", \"local dev\", \"local development\", \"local dev setup\", \"local environment setup\", \"verify my project locally\", \"set up emulators\". DO NOT USE FOR: deploying to Azure (use azure-deploy), generating Terraform or Bicep (use azure-prepare), Amazon, AWS, Google, GCP, container diagnostics (use azure-diagnostics), security audits (use azure-compliance), monitoring (use appinsights-instrumentation)."
 license: MIT
 metadata:
   author: Microsoft
@@ -65,15 +65,15 @@ Scan the full workspace for service roots. Always produces a list of `services[]
 
 ## Phase 1: Plan
 
-Create `.azure/local-development-plan.md` by completing these steps. Do NOT generate any artifacts until the plan is approved.
+Create `.azure/local-development-plan.md` by completing these steps **sequentially** — each step builds on the outputs of previous steps. Do NOT generate any artifacts until the plan is approved.
 
 | # | Action | Reference |
 |---|--------|-----------|
-| 1 | **Inventory Dependencies** — For each service: scan bindings/SDKs, identify emulators needed, check existing config | [inventory.md](references/inventory.md), [project-types/{type}.md](references/project-types/) |
-| 2 | **Detect Prerequisites** — Check which required tools are installed and which are missing | [inventory.md](references/inventory.md) |
+| 1 | **Inventory Dependencies** — For each service: scan bindings/SDKs, identify emulators needed, check existing config | [inventory.md](references/inventory.md), [project-types/{type}.md](references/project-types/), [runtimes/{rt}.md](references/runtimes/) |
+| 2 | **Detect Prerequisites** — Check which required tools are installed and which are missing | [inventory.md](references/inventory.md), [project-types/{type}.md](references/project-types/), [runtimes/{rt}.md](references/runtimes/) |
 | 3 | **Detect Migrations** — Scan for database migration files or ORM config; if found, plan a docker-compose migration service | [migrations.md](references/migrations.md) |
-| 4 | **Determine Launch Configuration** — Build the debug/launch configuration per service using the detected IDE | [runtimes/{rt}.md](references/runtimes/), [project-types/{type}.md](references/project-types/), [ide/{ide}.md](references/ide/) |
-| 5 | **Plan API Test Collection** — List HTTP endpoints and trigger-based functions that need test scripts | [inventory.md](references/inventory.md), [api-test-collections.md](references/api-test-collections.md) |
+| 4 | **Determine Launch Configuration** — Build the debug/launch configuration per service using the detected IDE | [ide/{ide}.md](references/ide/), [project-types/{type}.md](references/project-types/), [runtimes/{rt}.md](references/runtimes/) |
+| 5 | **Plan API Test Collection** — List HTTP endpoints and trigger-based functions that need test scripts | [api-test-collections.md](references/api-test-collections.md) |
 | 6 | **Limited-Support Warnings** — For every detected project type, runtime, IDE, and emulator: normalize to canonical ID, check for a matching file in the reference folder, and emit a `⚠️ LIMITED SUPPORT:` warning in your assistant message if no match exists. Log warnings in the plan's `## Limited Support` section. Never silently substitute a supported alternative. | [limited-support.md](references/limited-support.md) |
 | 7 | **Write Plan** — Generate `.azure/local-development-plan.md` using the template. Prerequisites section must list installed vs. missing with install links. Set **Created** and **Last Updated** to the current UTC datetime (ISO 8601). | [plan-template.md](references/plan-template.md) |
 | 8 | **Present Plan** — Show plan to user and ask for approval. If prerequisites are missing, highlight them and ask the user to install before proceeding. Once approved, update plan status to `Approved` and **Last Updated** timestamp. | `.azure/local-development-plan.md` |
