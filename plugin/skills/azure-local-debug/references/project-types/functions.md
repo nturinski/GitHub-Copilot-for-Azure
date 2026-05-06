@@ -1,6 +1,6 @@
 # Project Type: Azure Functions
 
-Reference guide for local development setup of Azure Functions projects.
+Local dev setup for Azure Functions projects.
 
 ---
 
@@ -9,11 +9,11 @@ Reference guide for local development setup of Azure Functions projects.
 | Signal | Notes |
 |--------|-------|
 | `host.json` present | Primary signal — required |
-| Azure Functions SDK in dependencies | Confirms it's a Functions project — see SDK Detection below |
+| Azure Functions SDK in dependencies | Confirms Functions project — see SDK Detection below |
 
 ### SDK Detection
 
-Check for Azure Functions SDK after confirming `host.json` exists:
+Check for Azure Functions SDK after confirming `host.json`:
 
 | Language | SDK Signal |
 |----------|-----------|
@@ -34,13 +34,13 @@ Check for Azure Functions SDK after confirming `host.json` exists:
 | python  | 🔲 Planned | [limited-support.md](../limited-support.md) |
 | java    | 🔲 Planned | [limited-support.md](../limited-support.md) |
 
-> **⚠️ Emulators only:** When a runtime with limited support is detected, proceed with emulator setup (docker-compose) — this is language-agnostic. Skip IDE debug/launch configuration generation and inform the user to configure those manually or notify and provide best effort attempt.
+> **⚠️ Emulators only:** Limited-support runtime detected → proceed with emulator setup (docker-compose, language-agnostic). Skip IDE debug/launch config generation; inform user to configure manually or provide best-effort attempt.
 
 ---
 
 ## Dependency Discovery
 
-Scan every `function.json` for its `"type"` binding field, **or** scan Python/Java source files for trigger decorator/attribute names. Each binding maps to an emulator.
+Scan every `function.json` for `"type"` binding field, **or** scan Python/Java source for trigger decorator/attribute names. Each binding maps to emulator.
 
 ### Binding → Emulator Mapping
 
@@ -56,13 +56,13 @@ Scan every `function.json` for its `"type"` binding field, **or** scan Python/Ja
 | `httpTrigger` | (built-in) | — | — | ✅ Implemented | — |
 | `timerTrigger` | (built-in) | — | — | ✅ Implemented | — |
 
-> **Azurite consolidation:** If multiple storage bindings (blob + queue + table) are detected, create a **single** Azurite service — not one per binding type.
+> **Azurite consolidation:** Multiple storage bindings (blob + queue + table) detected → create **single** Azurite service, not one per binding type.
 
 ### Services Without Azure Emulators
 
 | Binding Type | Azure Service | Recommendation |
 |-------------|---------------|----------------|
-| `signalR` | Azure SignalR | Use a dev-tier Azure SignalR instance |
+| `signalR` | Azure SignalR | Use dev-tier Azure SignalR instance |
 | PostgreSQL (SDK, not a binding) | Azure Database for PostgreSQL | [emulators/postgres.md](../emulators/postgres.md) |
 
 ---
@@ -73,7 +73,7 @@ Scan every `function.json` for its `"type"` binding field, **or** scan Python/Ja
 func host start
 ```
 
-> The Azure Functions Core Tools handle debug flag injection for the appropriate runtime automatically (e.g., `--inspect` for Node.js).
+> Azure Functions Core Tools handle debug flag injection automatically (e.g., `--inspect` for Node.js).
 
 ---
 
@@ -90,7 +90,7 @@ func host start
 | python  | `func host start` | `func: host start` | `attach` | 🔲 Planned | [limited-support.md](../limited-support.md) |
 | java    | `func host start` | `func: host start` | `attach` | 🔲 Planned | [limited-support.md](../limited-support.md) |
 
-The startup step depends on: the runtime-specific build/watch step from `runtimes/{rt}.md`, and the "Start Emulators" step.
+Startup step depends on: runtime-specific build/watch step from `runtimes/{rt}.md`, and "Start Emulators" step.
 
 Place emulator connection strings in `local.settings.json` under `"Values"`:
 
@@ -103,7 +103,7 @@ Place emulator connection strings in `local.settings.json` under `"Values"`:
 | SQL Edge | {detected from bindings} | — | 🔲 Planned | [limited-support.md](../limited-support.md) |
 | PostgreSQL | {detected from code} | See [emulators/postgres.md](../emulators/postgres.md) | ✅ Implemented | [emulators/postgres.md](../emulators/postgres.md) |
 
-> **Key discovery:** Except for `AzureWebJobsStorage` (a well-known Azure Functions convention), connection string key names are not fixed. The inventory phase ([inventory.md](../inventory.md)) detects the actual key names from bindings, SDK usage, and existing configuration files. Use the detected names — do not invent defaults.
+> **Key discovery:** Except `AzureWebJobsStorage` (well-known Azure Functions convention), connection string key names not fixed. Inventory phase ([inventory.md](../inventory.md)) detects actual key names from bindings, SDK usage, and config files. Use detected names — do not invent defaults.
 
 > **Never overwrite** existing values in `local.settings.json` — only add missing keys.
 
@@ -111,7 +111,7 @@ Place emulator connection strings in `local.settings.json` under `"Values"`:
 
 ## API Test Collections
 
-See [api-test-collections.md](../api-test-collections.md) for all test script patterns. For this project type, generate tests for:
+See [api-test-collections.md](../api-test-collections.md) for test script patterns. Generate tests for:
 
 - HTTP triggers → HTTP patterns with `baseUrl: http://localhost:7071/api`
 - Blob triggers → Storage § Blob trigger pattern

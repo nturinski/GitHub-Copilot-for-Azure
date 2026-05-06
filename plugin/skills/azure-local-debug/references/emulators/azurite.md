@@ -42,5 +42,5 @@ UseDevelopmentStorage=true
 ## Notes
 
 - Ports: 10000 (Blob), 10001 (Queue), 10002 (Table)
-- **Consolidation:** If multiple storage bindings are detected (blob + queue + table), use a **single** Azurite service — not one per binding type.
-- The Event Hubs Emulator requires Azurite for checkpointing. If both are needed, the `azurite` service is shared.
+- **Consolidation:** Multiple storage bindings (blob + queue + table) share **single** Azurite service — not one per binding type.
+- Event Hubs Emulator requires Azurite for checkpointing; share `azurite` service when both needed.

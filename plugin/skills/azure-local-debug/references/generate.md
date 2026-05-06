@@ -1,34 +1,34 @@
 # Artifact Generation
 
-Generate local development configuration files based on the approved plan.
+Generate local dev config files from approved plan.
 
 ---
 
 ## ⛔ CRITICAL: Plan Must Be Approved First
 
-**Do NOT generate any files until `.azure/local-development-plan.md` exists and the user has approved it.** The plan is the source of truth — generate exactly what it specifies.
+**Do NOT generate files until `.azure/local-development-plan.md` exists and user approved it.** Plan = source of truth — generate exactly what it specifies.
 
 ---
 
 ## Pre-Generation Checks
 
-Before generating any artifact, verify:
+Verify before generating:
 
 1. ✅ Plan exists at `.azure/local-development-plan.md` with status `Approved` or `Executing`
-2. ✅ Project type, IDE, and runtime were detected (from [classify.md](classify.md))
-3. ✅ Inventory results are documented in the plan (from [inventory.md](inventory.md))
-4. ✅ No existing file will be silently overwritten
+2. ✅ Project type, IDE, runtime detected (from [classify.md](classify.md))
+3. ✅ Inventory results documented in plan (from [inventory.md](inventory.md))
+4. ✅ No existing file silently overwritten
 
 ---
 
 ## Stale Data Directory Pre-Flight
 
-Before generating any files, check for leftover emulator data directories from a previous run (e.g. `.postgres/`, `.azurite/`, `.cosmos/`, `.servicebus/`). These directories can cause container startup failures — for example, PostgreSQL's `initdb` will refuse to initialize if `/var/lib/postgresql/data` (mounted from `.postgres/`) already contains files from an incompatible or partially-initialized cluster.
+Check for leftover emulator data dirs from prior run (e.g. `.postgres/`, `.azurite/`, `.cosmos/`, `.servicebus/`). These cause container startup failures — PostgreSQL `initdb` refuses to initialize if `/var/lib/postgresql/data` (mounted from `.postgres/`) contains files from incompatible/partial cluster.
 
-If any stale directories are found:
+If stale dirs found:
 
-1. **List all found directories** with their sizes.
-2. **Ask the user how to proceed** using `ask_user`:
+1. **List all found dirs** with sizes.
+2. **Ask user** via `ask_user`:
 
 ```
 ask_user(
@@ -40,22 +40,22 @@ ask_user(
 )
 ```
 
-3. **If the user chooses to delete** — Remove the directories (`rm -rf`) before proceeding with generation.
-4. **If the user wants to keep them** — Proceed, but warn that containers may fail to start. If they do fail, offer to clean up at that point.
-5. **Never delete data directories silently** — Always confirm with the user first.
+3. **User chooses delete** — `rm -rf` dirs before proceeding.
+4. **User keeps them** — Proceed, warn containers may fail. Offer cleanup if they do.
+5. **Never delete data dirs silently** — Always confirm first.
 
-> This check is especially important when the workspace was freshly scaffolded from a new `.azure/project-plan.md` but contains stale data from a prior project run.
+> Especially important when workspace freshly scaffolded from new `.azure/project-plan.md` but contains stale data from prior run.
 
 ---
 
 ## Port Conflict Pre-Flight
 
-Before generating any files, scan all ports required by the planned emulators (e.g. `lsof -i -P -n`).   For each occupied port, identify the process name and PID.
+Scan all ports needed by planned emulators (e.g. `lsof -i -P -n`). For each occupied port, identify process name and PID.
 
-If any conflicts are found:
+If conflicts found:
 
-1. **List all conflicts clearly** — port number, process name, PID.
-2. **Ask the user how to proceed** using `ask_user`:
+1. **List all conflicts** — port number, process name, PID.
+2. **Ask user** via `ask_user`:
 
 ```
 ask_user(
@@ -67,10 +67,10 @@ ask_user(
 )
 ```
 
-3. **If the user wants help remapping** — Propose alternative port numbers, update all references in the plan and project files (docker-compose service ports, connection strings, convenience scripts, IDE debug config), then resume generation.
-4. **If the user will handle it themselves** — Proceed with generation using the original ports. They will resolve conflicts before running `docker compose up`.
-5. **Never remap ports or modify config silently** — Always confirm with the user before making changes.
+3. **User wants remapping** — Propose alternative ports, update all references (docker-compose service ports, connection strings, convenience scripts, IDE debug config), then resume.
+4. **User handles it** — Proceed with original ports. They resolve conflicts before `docker compose up`.
+5. **Never remap ports or modify config silently** — Always confirm first.
 
 ### Reactive (When Containers Fail at Runtime)
 
-If containers fail to start after generation — or the user reports a container is unhealthy / docker compose errors — re-run the port scan and follow the same protocol above.
+If containers fail after generation — or user reports unhealthy container / docker compose errors — re-run port scan, follow same protocol above.

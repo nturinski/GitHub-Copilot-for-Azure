@@ -1,20 +1,20 @@
 # Inventory Dependencies
 
-Scan the workspace to identify Azure service dependencies, emulator requirements, prerequisite tools, migration configuration, and API test collection opportunities. This information feeds directly into the plan.
+Scan workspace for Azure service deps, emulator requirements, prerequisite tools, migration config, and API test collection opportunities. Feeds directly into plan.
 
-> For multi-service workspaces: loop over each service context in `services[]` from `classify.md`. Run steps 1–4 per service; deduplicate emulators and prerequisites across services using the shared workspace context from [multi-service.md](multi-service.md).
+> Multi-service workspaces: loop each service in `services[]` from `classify.md`. Run steps 1–4 per service; deduplicate emulators/prerequisites across services via shared workspace context from [multi-service.md](multi-service.md).
 
 ---
 
 ## Step 1: Identify Azure Service Dependencies
 
-Load the discovery ruleset for the current project type, then apply it to the workspace. The project type determines **how** to discover dependencies — binding scan vs SDK scan.
+Load discovery ruleset for current project type, apply to workspace. Project type determines **how** to discover deps — binding scan vs SDK scan.
 
 ### 1a. Functions: Binding Scan
 
-For Azure Functions projects, parse `function.json` files **or** decorator/attribute-based bindings in source code.
+Parse `function.json` files **or** decorator/attribute-based bindings in source code.
 
-> **Default: Azure emulators first.** Always prefer the official Azure-provided emulator for a service. Only fall back to a third-party or generic container when no Azure emulator exists (e.g., PostgreSQL).
+> **Default: Azure emulators first.** Prefer official Azure-provided emulator. Fall back to third-party/generic container only when no Azure emulator exists (e.g., PostgreSQL).
 
 | Binding Type | Azure Service | Emulator Reference |
 |-------------|---------------|-------------------|
@@ -31,7 +31,7 @@ For Azure Functions projects, parse `function.json` files **or** decorator/attri
 
 ### 1b. Container App / App Service: SDK Scan
 
-For non-Functions projects, scan dependency files for Azure SDK packages that imply service usage.
+Non-Functions projects: scan dependency files for Azure SDK packages implying service usage.
 
 | Package Pattern | Azure Service | Emulator Reference |
 |----------------|---------------|-------------------|
@@ -43,11 +43,11 @@ For non-Functions projects, scan dependency files for Azure SDK packages that im
 | `mssql` | Azure SQL | [limited-support.md](limited-support.md) |
 | `pg`, `postgres`, `@prisma/client` (postgres provider) | PostgreSQL¹ | [emulators/postgres.md](emulators/postgres.md) |
 
-> ¹ PostgreSQL has no Azure-provided emulator. If the project targets **Azure Cosmos DB for PostgreSQL**, note that no local emulator is available — flag this in the plan.
+> ¹ PostgreSQL has no Azure-provided emulator. If project targets **Azure Cosmos DB for PostgreSQL**, no local emulator available — flag in plan.
 
 ### 1c. Connection String Scan
 
-Look for connection references in `local.settings.json`, `.env`, or app configuration:
+Check connection references in `local.settings.json`, `.env`, or app config:
 
 ```bash
 # Check local.settings.json for connection values
@@ -61,13 +61,13 @@ cat .env .env.local .env.development 2>/dev/null | grep -i "connection\|storage\
 
 ## Step 2: Detect Database Migrations
 
-When a database dependency is detected, run through the detection and synthesis process in [migrations.md](migrations.md) to identify the migration tool and clarify / record the results. You are required to set up the docker-compose services that automate database migrations.
+On database dependency detected, run detection/synthesis in [migrations.md](migrations.md) to identify migration tool and record results. Set up docker-compose services that automate database migrations.
 
 ---
 
 ## Step 3: Detect Existing Configurations
 
-Check which local development artifacts already exist in the workspace:
+Check which local dev artifacts exist in workspace:
 
 | File | Status Values |
 |------|--------------|
@@ -80,11 +80,11 @@ Check which local development artifacts already exist in the workspace:
 | `migrations/` or ORM config | Found / Not found |
 | Migration script (e.g., `db:migrate` in `package.json`) | Found / Not found |
 
-If existing config is found, note it in the plan and ask the user — the generate phase should always default to **merge**, not overwrite.
+If existing config found, note in plan and ask user — generate phase defaults to **merge**, not overwrite.
 
 ## Step 4: Detect Prerequisites
 
-Check for required tools on the developer's machine. Only check tools relevant to the detected project type and runtime. Example:
+Check required tools on dev machine. Only check tools relevant to detected project type/runtime.
 
 | Tool | Detection Command | Required For |
 |------|-------------------|-------------|
@@ -100,11 +100,11 @@ Check for required tools on the developer's machine. Only check tools relevant t
 
 ## Step 5: Discover API Test Collection Opportunities
 
-Identify endpoints and triggers that would benefit from test scripts.
+Identify endpoints/triggers benefiting from test scripts.
 
 ### HTTP Triggers
 
-List all HTTP-triggered functions with their routes and methods:
+List all HTTP-triggered functions with routes and methods:
 
 ```markdown
 | Function | Route | Method | Auth Level |
@@ -115,7 +115,7 @@ List all HTTP-triggered functions with their routes and methods:
 
 ### Non-HTTP Triggers
 
-List triggers that need sample data or invocation scripts:
+List triggers needing sample data or invocation scripts:
 
 ```markdown
 | Function | Trigger Type | Required Data |
@@ -128,7 +128,7 @@ List triggers that need sample data or invocation scripts:
 
 ## Output
 
-Consolidate findings into a scan summary for the plan:
+Consolidate findings into scan summary for plan:
 
 ```markdown
 ## Inventory Results

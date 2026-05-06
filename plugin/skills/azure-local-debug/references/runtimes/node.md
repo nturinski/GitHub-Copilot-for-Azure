@@ -1,6 +1,6 @@
 # Node.js — Debug & Build Configuration
 
-> Covers both **JavaScript** and **TypeScript** projects. The debugger properties are identical; only the build chain differs.
+> Covers **JavaScript** and **TypeScript**. Debugger properties identical; only build chain differs.
 
 ## Prerequisites
 
@@ -13,15 +13,15 @@
 
 ## Debugger Properties
 
-Generic debug properties for this runtime. The IDE adapter in [ide/{ide}.md](../ide/) uses these facts to generate IDE-specific debug configuration.
+Debug properties for this runtime. IDE adapter in [ide/{ide}.md](../ide/) uses these to generate IDE-specific debug config.
 
 | Property | Value | Notes |
 |----------|-------|-------|
-| Debug protocol | `Node Inspector` | V8 inspector protocol over WebSocket. Each IDE maps this to its own adapter — e.g., VS Code uses `"type": "node"`. |
+| Debug protocol | `Node Inspector` | V8 inspector protocol over WebSocket. Each IDE maps to its own adapter — e.g., VS Code uses `"type": "node"`. |
 | Base debug port | `9229` | Default Node.js inspector port |
-| Auto-restart | `true` | Re-attach after the host restarts on file changes |
+| Auto-restart | `true` | Re-attach after host restarts on file changes |
 
-> **Monorepo / multi-service:** When multiple Node services are present, each is assigned a sequential debug port starting from the base port defined in the project type's Runtime Wiring table. See [multi-service.md](../multi-service.md) for port assignment rules.
+> **Monorepo / multi-service:** Multiple Node services get sequential debug ports from base port in project type's Runtime Wiring table. See [multi-service.md](../multi-service.md) for port assignment rules.
 
 ---
 
@@ -36,7 +36,7 @@ Generic debug properties for this runtime. The IDE adapter in [ide/{ide}.md](../
 
 ## Build Chain
 
-Tasks owned by this runtime: install, clean, build, watch. The startup task and its dependency wiring are provided by the project type's Runtime Wiring table — not this file.
+Runtime owns: install, clean, build, watch. Startup task and dependency wiring come from project type's Runtime Wiring table — not this file.
 
 ### node-ts (TypeScript)
 
@@ -69,10 +69,9 @@ Tasks owned by this runtime: install, clean, build, watch. The startup task and 
 
 > No compile, clean, or watch step — JavaScript runs directly.
 
-> **Monorepo / alternative package managers:** Adjust commands if the project uses `yarn`, `pnpm`, or a monorepo layout. The key invariant is the chain shape: **install → [clean → build/watch →] startup task** (compile steps only for TypeScript).
+> **Monorepo / alternative package managers:** Adjust commands for `yarn`, `pnpm`, or monorepo layouts. Key invariant — chain shape: **install → [clean → build/watch →] startup task** (compile steps only for TypeScript).
 
-See the active IDE adapter in [ide/{ide}.md](../ide/) for how these build steps are rendered into IDE-specific task configuration.
-
+See IDE adapter in [ide/{ide}.md](../ide/) for how build steps render into IDE-specific task config.
 
 ---
 
@@ -88,9 +87,9 @@ Add to `package.json` `"scripts"`:
 }
 ```
 
-> **`{data-dirs}`** — Space-separated list of all `./.{name}` emulator data directories from `docker-compose.yml`. Example: `.azurite .postgres` for Azurite + PostgreSQL. Derive from actual `volumes:` mounts — do not hardcode. See [generate.md](../generate.md) for derivation rules.
+> **`{data-dirs}`** — Space-separated list of `./.{name}` emulator data dirs from `docker-compose.yml`. Example: `.azurite .postgres`. Derive from actual `volumes:` mounts — do not hardcode. See [generate.md](../generate.md) for derivation rules.
 
-When migrations are detected, also add:
+When migrations detected, also add:
 
 ```json
 {
@@ -98,7 +97,7 @@ When migrations are detected, also add:
 }
 ```
 
-> The `db:migrate` script wraps the detected migration tool's CLI command (e.g., `npx prisma migrate deploy`, `npx knex migrate:latest`). See [migrations.md](../migrations.md) for how to determine the command.
+> `db:migrate` wraps detected migration tool CLI (e.g., `npx prisma migrate deploy`, `npx knex migrate:latest`). See [migrations.md](../migrations.md) for command determination.
 
 | Script | Location | Run Command |
 |--------|----------|-------------|

@@ -1,28 +1,28 @@
 # Classify Workspace
 
-Determine the project type(s) and runtime(s) to select the correct scanning rules, emulator mappings, and launch configurations.
+Determine project type(s) and runtime(s) to select correct scanning rules, emulator mappings, and launch configs.
 
-> **Always scan the full directory tree** — not just the workspace root. Service roots nested in subdirectories (e.g. `./api/`, `./web/`) must be found regardless of project layout.
+> **Always scan full directory tree** — not workspace root only. Service roots in subdirectories (e.g. `./api/`, `./web/`) must be found regardless of layout.
 
 ---
 
 ## ⛔ MANDATORY: Run Classification Before Anything Else
 
-Run the detection tables below **in order** (first match wins per root). Classification produces an array of service contexts — even single-service workspaces produce a one-item services list so the rest of the flow is uniform.
+Run detection tables below **in order** (first match wins per root). Classification produces array of service contexts — even single-service workspaces produce one-item services list so rest of flow is uniform.
 
 ---
 
 ## Step 0: Check for Project Plan (Optional Context)
 
-Before scanning for service roots, look for `.azure/project-plan.md` in the workspace root. This file is **not required** — skip this step silently if it does not exist.
+Before scanning for service roots, check for `.azure/project-plan.md` in workspace root. **Not required** — skip silently if absent.
 
-> Treat this project plan as **advisory context**, not as a substitute for detection. Always run the full detection tables below — but use the plan to resolve ambiguity, validate findings, and avoid misclassification.
+> Treat project plan as **advisory context**, not substitute for detection. Always run full detection tables — use plan to resolve ambiguity, validate findings, avoid misclassification.
 
 ---
 
 ## Step 1: Detect Project Types
 
-Scan every subdirectory for the following signals. Ignore: `node_modules/`, `.git/`, `dist/`, `build/`, `bin/`, `obj/`.
+Scan every subdirectory for these signals. Ignore: `node_modules/`, `.git/`, `dist/`, `build/`, `bin/`, `obj/`.
 
 ### Project Type Detection Table
 
@@ -36,14 +36,14 @@ Scan every subdirectory for the following signals. Ignore: `node_modules/`, `.gi
 | 5 | SPA framework detected (React/Vue/Angular/Svelte via `package.json`) **OR** `vite.config.*` / `next.config.*` / `angular.json` present **AND** no `host.json` | **Frontend SPA** | ✅ Implemented | [project-types/frontend-spa.md](project-types/frontend-spa.md) |
 | ∞ | No match | **Unknown** | — | [limited-support.md](limited-support.md) |
 
-> **Frontend SPA projects** may not require emulators or Azure bindings, but they **are** service roots. They contribute a browser debug configuration and a dev-server task. When a frontend is detected alongside a backend, the workspace is multi-service and **must** produce a compound debug configuration. See the active IDE adapter in [ide/](ide/) for the IDE-specific format.
+> **Frontend SPA projects** may not need emulators or Azure bindings, but **are** service roots. They contribute browser debug config and dev-server task. When frontend detected alongside backend, workspace is multi-service and **must** produce compound debug config. See active IDE adapter in [ide/](ide/) for IDE-specific format.
 
 
 ---
 
 ## Step 2: Detect Runtimes
 
-After identifying the project type for a root, determine the language and runtime version for each service root.
+After identifying project type per root, determine language and runtime version for each service root.
 
 ### Runtime Detection Table
 
@@ -61,15 +61,15 @@ After identifying the project type for a root, determine the language and runtim
 
 ## Step 3: Detect IDE (Workspace-Level)
 
-Determine the target IDE for the workspace. The IDE applies to the entire workspace, not per-service. Use the following priority:
+Determine target IDE for workspace. IDE applies to entire workspace, not per-service. Priority:
 
-1. **Explicit user request** — The user names an IDE in their prompt (highest priority)
-2. **Existing workspace artifacts** — Check for IDE-specific files in the workspace root
-3. **Ask the user** — If no signal is found from the prompt or workspace, use `ask_user` to ask which IDE they want to target
+1. **Explicit user request** — user names IDE in prompt (highest priority)
+2. **Existing workspace artifacts** — check for IDE-specific files in workspace root
+3. **Ask the user** — if no signal from prompt or workspace, use `ask_user` to ask target IDE
 
 ### ⛔ MUST: IDE Name Normalization
 
-Normalize the user's IDE reference to a **canonical ID** using this table. These are **different products** — do NOT treat one as shorthand for another.
+Normalize user's IDE reference to **canonical ID** using this table. These are **different products** — do NOT treat one as shorthand for another.
 
 | User says | Canonical ID | Maps to | Reference |
 |-----------|-------------|---------|-----------|
@@ -77,15 +77,15 @@ Normalize the user's IDE reference to a **canonical ID** using this table. These
 | "Visual Studio", "VS" (without "Code") | `visual-studio` | **Visual Studio** | [limited-support.md](limited-support.md) |
 | Other | — | — | [limited-support.md](limited-support.md) |
 
-> ⛔ **"Visual Studio" ≠ "VS Code".** These are different IDEs. If the user says "Visual Studio" or "VS", you MUST classify as `visual-studio`, NOT `vscode`. Misclassifying the IDE violates this rule.
+> ⛔ **"Visual Studio" ≠ "VS Code".** Different IDEs. If user says "Visual Studio" or "VS", MUST classify as `visual-studio`, NOT `vscode`. Misclassifying IDE violates this rule.
 
-After normalizing, check whether `references/ide/{canonical-id}.md` exists. If it does NOT exist, the IDE has **limited support** — you MUST follow the [limited-support.md](limited-support.md) emission protocol before proceeding. Do NOT silently fall back to a supported IDE.
+After normalizing, check whether `references/ide/{canonical-id}.md` exists. If not, IDE has **limited support** — MUST follow [limited-support.md](limited-support.md) emission protocol before proceeding. Do NOT silently fall back to supported IDE.
 
 ---
 
 ## Step 4: Determine Single-Service vs Multi-Service
 
-Count the number of service roots found:
+Count service roots found:
 
 | Result | Next Step |
 |--------|-----------|
@@ -96,7 +96,7 @@ Count the number of service roots found:
 
 ## Output Format
 
-Always produce a workspace context with `ide` and a `services[]` array (even for single-service workspaces):
+Always produce workspace context with `ide` and `services[]` array (even for single-service):
 
 **Single-service:**
 ```
@@ -115,4 +115,4 @@ services:
   - { root: ./web, projectType: app-service,  runtime: node-ts }
 ```
 
-Carry this context into the next phase. Do NOT read `project-types/`, `runtimes/`, or `ide/` files here — classification only produces types, paths, and the target IDE.
+Carry this context into next phase. Do NOT read `project-types/`, `runtimes/`, or `ide/` files here — classification only produces types, paths, and target IDE.

@@ -1,16 +1,16 @@
 # Limited Support Warnings
 
-> Emit a standardized warning when the skill detects a feature that is not yet fully implemented. The warning format is consistent across all feature categories so the user always knows what to expect.
+> Emit standardized warning when skill detects feature not fully implemented. Format consistent across all categories.
 
 ---
 
 ## ⛔ Detection Algorithm — MANDATORY
 
-For every detected project type, runtime, IDE, and emulator, follow this procedure **exactly**:
+For every detected project type, runtime, IDE, emulator, follow **exactly**:
 
-1. **Check for a match** — List the files in the category folder (ignoring `_template.md`). If any filename loosely matches the detected value (ignoring case, spaces, dashes, and underscores), the feature is supported.
-2. **If a match exists** → the feature is fully supported. Proceed normally.
-3. **If no match exists** → the feature has limited support. You **MUST** emit a warning. Do NOT substitute a different, supported feature.
+1. **Check for match** — List files in category folder (ignore `_template.md`). If any filename loosely matches detected value (ignore case, spaces, dashes, underscores), feature is supported.
+2. **Match exists** → fully supported. Proceed normally.
+3. **No match** → limited support. **MUST** emit warning. Do NOT substitute different supported feature.
 
 | Category | Category Folder |
 |----------|-----------------|
@@ -19,7 +19,7 @@ For every detected project type, runtime, IDE, and emulator, follow this procedu
 | IDE | `references/ide/` |
 | Emulator | `references/emulators/` |
 
-> ⚠️ **Do NOT skip this check.** Every detected feature MUST be verified against the category folder before proceeding. If you are unsure, list the files in the folder to confirm.
+> ⚠️ **Do NOT skip this check.** Every detected feature MUST be verified against category folder. If unsure, list files to confirm.
 
 ---
 
@@ -30,18 +30,18 @@ For every detected project type, runtime, IDE, and emulator, follow this procedu
 ```
 
 Where:
-- `{Category}` — a short label for the feature area (e.g., `Project type`, `Runtime`, `Emulator`, `IDE`)
-- `{value}` — the specific feature detected (e.g., `python`, `Container App`, `Cosmos DB`, `Visual Studio`)
+- `{Category}` — short label for feature area (e.g., `Project type`, `Runtime`, `Emulator`, `IDE`)
+- `{value}` — specific feature detected (e.g., `python`, `Container App`, `Cosmos DB`, `Visual Studio`)
 
 ---
 
 ## ⛔ Emission Protocol — MANDATORY
 
-When a limited-support feature is detected, you **MUST** follow this exact sequence:
+When limited-support feature detected, **MUST** follow this exact sequence:
 
 ### Step 1: Emit in assistant message
 
-Write the canonical warning in your **regular assistant message text**. This is mandatory — the warning must be visible in the chat output, not hidden inside a tool call.
+Write canonical warning in **regular assistant message text**. Mandatory — warning must be visible in chat output, not hidden in tool call.
 
 ```
 ⚠️ LIMITED SUPPORT: Emulator "Durable Task Scheduler" is not yet fully supported.
@@ -49,7 +49,7 @@ Write the canonical warning in your **regular assistant message text**. This is 
 
 ### Step 2: Confirm with user
 
-For the **first** limited-support feature encountered in the session, call `ask_user` to confirm whether to proceed:
+For **first** limited-support feature in session, call `ask_user` to confirm:
 
 ```
 ask_user(
@@ -61,11 +61,11 @@ ask_user(
 )
 ```
 
-If the user agrees, treat that as blanket consent for the rest of the session. Any additional limited-support features discovered later should still be emitted as a warning in the assistant message text using the same `⚠️ LIMITED SUPPORT:` format — but do **not** call `ask_user` again.
+If user agrees, treat as blanket consent for rest of session. Later limited-support features still emit `⚠️ LIMITED SUPPORT:` warning in assistant message — but do **not** call `ask_user` again.
 
 ### Step 3: Record in plan
 
-Add the item to the `## Limited Support` section in `.azure/local-development-plan.md`. See [Plan Integration](#plan-integration) below.
+Add item to `## Limited Support` section in `.azure/local-development-plan.md`. See [Plan Integration](#plan-integration).
 
 > Emit each `⚠️ LIMITED SUPPORT:` warning exactly once per `(Category, value)` pair in assistant messages. 
 
@@ -73,13 +73,13 @@ Add the item to the `## Limited Support` section in `.azure/local-development-pl
 
 ## No Silent Substitution
 
-**Do NOT silently substitute a supported alternative** when a feature has limited support (e.g. switching a Container App to Azure Functions, or Python to Node.js, or Visual Studio to VS Code). Always plan for the project type, runtime, IDE, and emulators the user actually requested, even when support is limited.
+**Do NOT silently substitute supported alternative** when feature has limited support (e.g. switching Container App to Azure Functions, Python to Node.js, Visual Studio to VS Code). Always plan for project type, runtime, IDE, emulators user requested, even when support is limited.
 
 ---
 
 ## Plan Integration
 
-When **any** limited-support items exist, the `## Limited Support` section in `.azure/local-development-plan.md` is **mandatory**. Add every limited-support item so the user can review them before approving the plan.
+When **any** limited-support items exist, `## Limited Support` section in `.azure/local-development-plan.md` is **mandatory**. Add every limited-support item for user review before plan approval.
 
 ---
 

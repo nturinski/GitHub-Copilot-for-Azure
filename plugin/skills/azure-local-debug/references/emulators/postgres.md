@@ -1,6 +1,6 @@
 # PostgreSQL
 
-> PostgreSQL has no Azure-provided emulator. Use the standard `postgres` Docker image for local development. If the project targets **Azure Cosmos DB for PostgreSQL**, note in the plan that no local emulator is available.
+> No Azure-provided emulator. Use standard `postgres` Docker image locally. If targeting **Azure Cosmos DB for PostgreSQL**, note no local emulator exists.
 
 ## Docker Image
 
@@ -44,11 +44,11 @@ postgresql://postgres:postgres@localhost:5432/localdev
 | `DATABASE_URL` | `postgresql://postgres:postgres@localhost:5432/localdev` |
 | `POSTGRES_CONNECTION_STRING` | `postgresql://postgres:postgres@localhost:5432/localdev` |
 
-> Use whichever variable name the project's ORM or SDK expects. Both forms above are shown as reference.
+> Use whichever variable project ORM/SDK expects. Both forms shown as reference.
 
 ## Healthcheck
 
-The healthcheck is included in the docker-compose service block above. It uses `pg_isready` to verify PostgreSQL is accepting connections. The migration service (see [migrations.md](../migrations.md)) depends on `condition: service_healthy` to wait for readiness before running migrations.
+Healthcheck included in docker-compose block above. Uses `pg_isready` to verify PostgreSQL accepts connections. Migration service (see [migrations.md](../migrations.md)) depends on `condition: service_healthy` to wait before running migrations.
 
 ```yaml
 healthcheck:
@@ -61,6 +61,6 @@ healthcheck:
 
 ## Notes
 
-- Port 5432 is the standard PostgreSQL port.
-- Default credentials (`postgres`/`postgres`) are intentionally simple for local dev. Never use in production.
-- Data is persisted to `./.postgres/`.
+- Port 5432: standard PostgreSQL port.
+- Default credentials (`postgres`/`postgres`) intentionally simple for local dev. Never use in production.
+- Data persisted to `./.postgres/`.

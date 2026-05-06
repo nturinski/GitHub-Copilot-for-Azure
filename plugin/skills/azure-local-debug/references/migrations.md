@@ -1,12 +1,12 @@
 # Database Migrations
 
-Detect, configure, and auto-run database migrations before local development sessions. The goal is for migrations to run automatically immediately after emulators start via `docker compose up -d`.
+Detect, configure, auto-run DB migrations before local dev sessions. Migrations run automatically after emulators start via `docker compose up -d`.
 
 ---
 
 ## Overview
 
-Database migrations are **not** a separate manual step. When migrations are detected, they are incorporated into `docker-compose.yml` as a one-shot service that runs automatically during the existing "Start Emulators" step. No changes to the IDE task/build chain are needed:
+Migrations are **not** a separate manual step. When detected, incorporated into `docker-compose.yml` as one-shot service running automatically during "Start Emulators" step. No IDE task/build chain changes needed:
 
 ```
 Debug start → "{host start task}"
@@ -21,11 +21,11 @@ Debug start → "{host start task}"
 
 ## Detection
 
-Detection is **evidence-based, not opinionated**. Scan three layers of the workspace — files, dependencies, and scripts — then synthesize findings to determine what migration system is in use. Do not assume a particular tool; let the evidence decide.
+Detection is **evidence-based, not opinionated**. Scan three workspace layers — files, dependencies, scripts — then synthesize findings. Don't assume a tool; let evidence decide.
 
 ### Layer 1: Migration Files
 
-Scan for files and directories that contain migration definitions. Look for tool-specific config files, migration directories, and file naming patterns. 
+Scan for migration definitions: tool-specific config files, migration directories, naming patterns.
 
 #### Examples:
 
@@ -36,36 +36,36 @@ Scan for files and directories that contain migration definitions. Look for tool
 - `flyway.conf` → Flyway / Liquibase (Java)
 - `migrations/*.sql` → Raw SQL (no tool)
 
-> Not exhaustive — if migration-like files don't match a known pattern, examine them to identify the tool.
+> Not exhaustive — if migration-like files don't match known patterns, examine them to identify tool.
 
 ### Layer 2: Dependencies
 
-Check the project's dependency manifest (e.g., `package.json`, `requirements.txt`, `*.csproj`, `go.mod`) for migration tools (e.g., `alembic`, `drizzle`), ORMs with built-in migration support (e.g., `prisma`, `TypeORM`, `Django`), and database driver packages (e.g., `pg`, `mysql2`) — drivers confirm the target database even when no migration tool is present.
+Check dependency manifests (`package.json`, `requirements.txt`, `*.csproj`, `go.mod`) for migration tools (`alembic`, `drizzle`), ORMs with migration support (`prisma`, `TypeORM`, `Django`), and DB driver packages (`pg`, `mysql2`) — drivers confirm target DB even without migration tool.
 
 ### Layer 3: Scripts
 
-Check the project's script runner (e.g., `package.json`, `Makefile`, `pyproject.toml`) for existing migration commands. Grep for terms like `migrate`, `schema`, `seed`, and known tool names. The key signal is any command that applies schema changes to a database.
+Check script runners (`package.json`, `Makefile`, `pyproject.toml`) for migration commands. Grep for `migrate`, `schema`, `seed`, known tool names. Key signal: any command applying schema changes.
 
 ### Synthesis
 
-After scanning all three layers, determine:
+After scanning all layers, determine:
 
-1. **Which migration tool is in use** — Cross-reference files, dependencies, and scripts. All three layers should agree. If they conflict (e.g., both Alembic and Django migrations exist), ask the user which one is active.
-2. **Whether an existing migration command exists** — If the project already has a working migration script/command, use it directly rather than inventing a new one.
-3. **Whether a migration command needs to be built** — If the tool is clear from dependencies/files but no script exists, construct the appropriate command based on the tool's documentation.
+1. **Which migration tool is in use** — Cross-reference files, deps, scripts. All layers should agree. If conflict (e.g., both Alembic and Django), ask user which is active.
+2. **Whether existing migration command exists** — If project has working migration script/command, use it directly.
+3. **Whether migration command needs building** — If tool is clear from deps/files but no script exists, construct appropriate command from tool docs.
 
-> **Prefer existing scripts.** If the project already has a script that runs migrations, wrap that in the docker-compose service rather than building a parallel command.
+> **Prefer existing scripts.** If project has migration script, wrap it in docker-compose service rather than building parallel command.
 
 ### Insufficient Evidence
 
-If a database dependency is detected (e.g., `pg` in dependencies, PostgreSQL in docker-compose) but **none of the three layers reveal a clear migration strategy** — no migration files, no migration tool in dependencies, no migration scripts — then:
+If DB dependency detected (e.g., `pg` in deps, PostgreSQL in docker-compose) but **no layer reveals a clear migration strategy** — no migration files, no migration tool in deps, no migration scripts — then:
 
-1. **Do not guess.** Do not assume raw SQL or any particular tool.
-2. **Ask the user** using `ask_user`:
-   - Explain what was found (database dependency without a migration strategy)
+1. **Don't guess.** Don't assume raw SQL or any tool.
+2. **Ask user** via `ask_user`:
+   - Explain what was found (DB dependency without migration strategy)
    - Ask how they manage schema changes (e.g. "Do you use a migration tool, raw SQL files, or manage the schema manually?")
-   - Offer to skip migration setup if they handle it another way
-3. **Record the gap** in the plan so it's visible:
+   - Offer to skip migration setup
+3. **Record gap** in plan:
 
 ```markdown
 ### Database Migrations
@@ -80,7 +80,7 @@ If a database dependency is detected (e.g., `pg` in dependencies, PostgreSQL in 
 
 ### What to Record
 
-When migrations are detected, add to the scan results:
+When migrations detected, add to scan results:
 
 ```markdown
 ### Database Migrations
@@ -99,7 +99,7 @@ When migrations are detected, add to the scan results:
 
 ## Docker Compose Patterns
 
-Two patterns are needed when migrations are detected: a **healthcheck** on the database service to signal readiness, and a one-shot **migration service** that waits for the healthcheck, applies changes, and exits.
+Two patterns needed when migrations detected: **healthcheck** on DB service for readiness, and one-shot **migration service** that waits for healthcheck, applies changes, exits.
 
 ### Database Emulators
 
@@ -111,31 +111,31 @@ Two patterns are needed when migrations are detected: a **healthcheck** on the d
 | CosmosDB | [limited-support.md](limited-support.md) |
 | MongoDB | [limited-support.md](limited-support.md) |
 
-> 💡 **No corresponding emulator reference file?** Emit the limited support warning if applicable per [limited-support.md](limited-support.md), then make a best-effort attempt using the patterns below.
+> 💡 **No emulator reference file?** Emit limited support warning per [limited-support.md](limited-support.md), then best-effort attempt using patterns below.
 
 ### Healthcheck Pattern
 
-When migrations are present, the target database service **must** have a healthcheck so the migration service can use `depends_on` with `condition: service_healthy` to wait for readiness. The healthcheck definition belongs in the emulator's docker-compose config — see the [Database Emulators](#database-emulators) table above for the reference file containing each database's healthcheck block.
+When migrations present, target DB service **must** have healthcheck so migration service can use `depends_on` with `condition: service_healthy`. Healthcheck definition belongs in emulator's docker-compose config — see [Database Emulators](#database-emulators) table for reference file with each DB's healthcheck block.
 
-For databases without an emulator reference file, construct a best-effort healthcheck using a test that verifies the database accepts connections using its CLI client.
+For DBs without emulator reference file, construct best-effort healthcheck verifying DB accepts connections via its CLI client.
 
 ### Migration Service Pattern
 
-The goal is a **single standardized flow**: every project ends up with a migration script in its native script runner (e.g. `npm run db:migrate`, `make db-migrate`). The docker-compose migration service calls that script, and the developer can also run it manually against any target.
+Goal: **single standardized flow** — every project gets migration script in native script runner (e.g. `npm run db:migrate`, `make db-migrate`). Docker-compose migration service calls that script; developer can also run it manually against any target.
 
 #### Step 1: Ensure a Migration Script Exists
 
 | Detection Evidence | Instruction |
 |--------------------|-------------|
-| Existing migration script in project (e.g., `npm run db:migrate`) | Use it as-is. Skip to Step 2. |
-| Application migration tool detected (e.g., Prisma, Alembic, EF Core) but no script | Create a script in the project's native script runner that wraps the tool's CLI command (e.g., `"db:migrate": "npx prisma migrate deploy"` in `package.json`). |
-| Raw SQL files only (`migrations/*.sql`), no migration tool | Recommend and install a lightweight migration tool as a dev dependency (e.g., `node-pg-migrate` for Node.js, `golang-migrate` for Go, `alembic` for Python). Configure it to use the existing `migrations/` directory, then create a script wrapping its CLI. Ask the user before installing. |
+| Existing migration script in project (e.g., `npm run db:migrate`) | Use as-is. Skip to Step 2. |
+| Migration tool detected (e.g., Prisma, Alembic, EF Core) but no script | Create script in native script runner wrapping tool's CLI (e.g., `"db:migrate": "npx prisma migrate deploy"` in `package.json`). |
+| Raw SQL files only (`migrations/*.sql`), no migration tool | Recommend/install lightweight migration tool as dev dependency (e.g., `node-pg-migrate` for Node.js, `golang-migrate` for Go, `alembic` for Python). Configure for existing `migrations/` dir, create wrapping script. Ask user before installing. |
 
-> **Why install a tool for raw SQL?** A migration tool gives raw SQL files a proper CLI, idempotency tracking (so migrations don't re-run), and a consistent interface. This eliminates database-specific shell scripts and lets the same project script work against any target — local container, remote dev, staging, etc.
+> **Why install tool for raw SQL?** Gives proper CLI, idempotency tracking (no re-runs), consistent interface. Eliminates DB-specific shell scripts; same project script works against any target — local container, remote dev, staging, etc.
 
 #### Step 2: Wire the Script into Docker Compose
 
-The migration service calls the project's migration script inside a container with the right runtime.
+Migration service calls project's migration script inside container with correct runtime.
 
 ```yaml
 services:
@@ -154,16 +154,16 @@ services:
     restart: "no"
 ```
 
-**Filling in the template — use detected evidence:**
+**Filling in template — use detected evidence:**
 
 | Placeholder | How to determine |
 |-------------|-----------------|
-| `RUNTIME_IMAGE` | A Docker image that provides the language runtime the project uses. See the table below. |
-| `DATABASE_SERVICE` | The compose service name for the target database (e.g., `postgres`, `sqlserver`) |
-| `CONNECTION_ENV_VAR` | The environment variable the migration tool expects. Check the tool's config file, `local.settings.json`, `.env`, or framework conventions. |
-| `CONNECTION_STRING_FOR_COMPOSE_NETWORK` | Same shape as the local connection string but with the compose service name as host instead of `localhost` (e.g., `postgresql://postgres:postgres@postgres:5432/localdev`) |
-| `EXTRA_VOLUME_MOUNTS` | Additional mounts needed for the ecosystem (e.g., `node_modules`, `.venv`). See the table below. |
-| `MIGRATION_SCRIPT` | The project's migration script command (e.g., `["npm", "run", "db:migrate"]`, `["make", "db-migrate"]`) |
+| `RUNTIME_IMAGE` | Docker image providing project's language runtime. See table below. |
+| `DATABASE_SERVICE` | Compose service name for target DB (e.g., `postgres`, `sqlserver`) |
+| `CONNECTION_ENV_VAR` | Env var migration tool expects. Check tool's config, `local.settings.json`, `.env`, or framework conventions. |
+| `CONNECTION_STRING_FOR_COMPOSE_NETWORK` | Same shape as local connection string but compose service name as host instead of `localhost` (e.g., `postgresql://postgres:postgres@postgres:5432/localdev`) |
+| `EXTRA_VOLUME_MOUNTS` | Additional mounts for ecosystem (e.g., `node_modules`, `.venv`). See table below. |
+| `MIGRATION_SCRIPT` | Project's migration script command (e.g., `["npm", "run", "db:migrate"]`, `["make", "db-migrate"]`) |
 
 **Runtime images and extra volume mounts:**
 
@@ -175,18 +175,18 @@ services:
 | Java | [limited-support.md](limited-support.md) | | |
 | Go | [limited-support.md](limited-support.md) | | |
 
-> 💡 **Limited support runtimes:** For ecosystems without a fully documented configuration above, emit the limited support warning per [limited-support.md](limited-support.md), then make a best-effort attempt. Choose a slim official Docker image for the runtime (e.g., `python:{version}-slim`, `mcr.microsoft.com/dotnet/sdk:{version}`), mount the project read-only, and include any dependency directories the migration tool needs to run. The same docker-compose invariants apply.
+> 💡 **Limited support runtimes:** For ecosystems without full config above, emit limited support warning per [limited-support.md](limited-support.md), then best-effort attempt. Choose slim official Docker image (e.g., `python:{version}-slim`, `mcr.microsoft.com/dotnet/sdk:{version}`), mount project read-only, include dependency dirs migration tool needs. Same docker-compose invariants apply.
 
 > **Key properties:**
-> - `depends_on` with `condition: service_healthy` — waits for the database to accept connections
-> - `volumes` with `:ro` — mounts project files read-only for safety
-> - `restart: "no"` — runs once per `docker compose up`, does not restart after exit
-> - Mount ecosystem-specific dependency directories (e.g., `node_modules`, `.venv`) when the migration tool is installed as a project dependency
+> - `depends_on` with `condition: service_healthy` — waits for DB to accept connections
+> - `volumes` with `:ro` — mounts project read-only for safety
+> - `restart: "no"` — runs once per `docker compose up`, no restart after exit
+> - Mount ecosystem-specific dependency dirs (e.g., `node_modules`, `.venv`) when migration tool installed as project dependency
 
 #### Result
 
-After both steps, the developer has:
+After both steps, developer has:
 
-- **One script** (`npm run db:migrate` / `make db-migrate`) that runs migrations against any target via environment variables
-- **Automatic migration** on `docker compose up -d` via the `db-migrate` service
-- **Manual migration** option if the script is invoked directly — can target localhost, a remote dev database, staging, etc.
+- **One script** (`npm run db:migrate` / `make db-migrate`) running migrations against any target via env vars
+- **Automatic migration** on `docker compose up -d` via `db-migrate` service
+- **Manual migration** by invoking script directly — can target localhost, remote dev DB, staging, etc.

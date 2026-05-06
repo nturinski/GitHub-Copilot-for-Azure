@@ -1,6 +1,6 @@
 # Project Type: Frontend SPA
 
-Reference guide for local development setup of frontend single-page application projects.
+Local dev setup ref for frontend SPA projects.
 
 ---
 
@@ -25,13 +25,13 @@ Reference guide for local development setup of frontend single-page application 
 
 ## Dependency Discovery
 
-Frontend SPAs communicate with backend services via HTTP during local development — they do not connect to Azure emulators directly. In monorepo setups, Azure service dependencies (storage, databases, etc.) are handled by the backend project type. In standalone SPA projects, the backend may already be running as a deployed service or a separate local process — no emulator setup is needed for the SPA itself.
+Frontend SPAs talk to backends via HTTP in local dev — no direct Azure emulator connections. In monorepos, Azure service deps (storage, databases, etc.) handled by backend project type. In standalone SPA projects, backend runs as deployed service or separate local process — no emulator setup needed for SPA.
 
 ---
 
 ## Startup Command
 
-The startup command is the framework's dev server:
+Startup command = framework dev server:
 
 | Framework | Default Command | Default Dev Port |
 |-----------|---------|-----------------|
@@ -49,13 +49,13 @@ The startup command is the framework's dev server:
 
 | Runtime | Startup command | Startup task label | Request Mode | Notes |
 |---------|----------------|-------------------|--------------|-------|
-| node | `npm run dev` | `{id} dev` | `launch` | IDE launches a browser; dev server is a prerequisite task |
+| node | `npm run dev` | `{id} dev` | `launch` | IDE launches browser; dev server is prerequisite task |
 
 ---
 
 ## Framework Detection & Problem Matchers
 
-Each frontend framework emits different console output when the dev server is ready. These patterns are used for background problem matchers in the IDE build configuration.
+Each framework emits different console output when dev server ready. Patterns used for background problem matchers in IDE build config.
 
 | Framework | Detection | Ready Pattern (begins) | Ready Pattern (ends) |
 |-----------|----------|----------------------|---------------------|
@@ -64,4 +64,4 @@ Each frontend framework emits different console output when the dev server is re
 | Angular | `angular.json` | `Compiling` | `Compiled successfully` |
 | Create React App | `react-scripts` in dependencies | `Starting the development server` | `Compiled` |
 
-> All background problem matchers must include `"activeOnStart": true` and a no-op error pattern (`"regexp": "^$"`). The `owner` field should be set to the framework name (lowercased).
+> All background problem matchers must include `"activeOnStart": true` and no-op error pattern (`"regexp": "^$"`). `owner` field = framework name (lowercased).

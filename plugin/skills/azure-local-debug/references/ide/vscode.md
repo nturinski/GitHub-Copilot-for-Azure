@@ -2,7 +2,7 @@
 
 ## Overview
 
-VS Code uses two JSON files under `.vscode/` to configure debugging and build tasks.
+VS Code uses two JSON files under `.vscode/` for debugging and build tasks.
 
 ## Configuration File Paths
 
@@ -15,7 +15,7 @@ VS Code uses two JSON files under `.vscode/` to configure debugging and build ta
 
 ## Debug Configuration — `launch.json`
 
-The skill assembles `launch.json` entries by combining **debugger properties** from `runtimes/{rt}.md` (port) and **request mode** from `project-types/{type}.md` with the VS Code-specific wrapper below.
+Assembles `launch.json` entries by combining **debugger properties** from `runtimes/{rt}.md` (port) and **request mode** from `project-types/{type}.md` with VS Code wrapper below.
 
 ### Template
 
@@ -34,18 +34,18 @@ The skill assembles `launch.json` entries by combining **debugger properties** f
 
 | Field | Source | Notes |
 |-------|--------|-------|
-| `name` | Service ID from [multi-service.md](../multi-service.md) or project name | Always suffixed with `(debug)` |
-| `type` | **Server-side:** Debug protocol from `runtimes/{rt}.md` → mapped to VS Code adapter in runtime table below. **Browser-based:** Project type from `project-types/{type}.md` → mapped in project-type table below. | The source depends on whether the debugger attaches to a runtime process or launches a browser. |
-| `request` | `project-types/{type}.md` → Runtime Wiring → `Request Mode` | `"attach"` when the host command spawns the runtime; `"launch"` when the IDE starts it directly |
+| `name` | Service ID from [multi-service.md](../multi-service.md) or project name | Suffixed with `(debug)` |
+| `type` | **Server-side:** Debug protocol from `runtimes/{rt}.md` → mapped via runtime table below. **Browser-based:** Project type from `project-types/{type}.md` → mapped via project-type table below. | Depends on whether debugger attaches to runtime process or launches browser. |
+| `request` | `project-types/{type}.md` → Runtime Wiring → `Request Mode` | `"attach"` when host command spawns runtime; `"launch"` when IDE starts it |
 | `port` | `runtimes/{rt}.md` → `Base debug port` | Incremented per service in monorepos (see [multi-service.md § Port Assignment](../multi-service.md)). Not used for browser-based configs (use `url` instead). |
-| `restart` | Always `true` | Re-attach after the host restarts on file changes |
-| `preLaunchTask` | `project-types/{type}.md` → startup task label | e.g. `"func: host start"` — rendered via the per-project-type subsection in Build Configuration below |
+| `restart` | Always `true` | Re-attach after host restarts on file changes |
+| `preLaunchTask` | `project-types/{type}.md` → startup task label | e.g. `"func: host start"` — rendered via per-project-type subsection in Build Configuration below |
 
 ### Runtime Debug Protocol → VS Code Adapter Mapping
 
-> For server-side project types (Functions, App Service, etc.) where the debugger attaches to a runtime process.
+> For server-side project types (Functions, App Service, etc.) attaching to runtime process.
 >
-> **To add a new runtime:** add a row here, then create or update the corresponding `runtimes/{rt}.md` with the debugger properties.
+> **To add new runtime:** add row here, then create/update corresponding `runtimes/{rt}.md` with debugger properties.
 
 | Runtime | Debug Protocol → VS Code Debugger Type | Extra Fields | Status |
 |---------|----------------------|--------------|--------|
@@ -57,7 +57,7 @@ The skill assembles `launch.json` entries by combining **debugger properties** f
 
 ### Project-Type → VS Code Adapter Mapping
 
-> For browser-based project types where the IDE launches a browser instead of attaching to a runtime process. These adapters are determined by the project type, not the runtime.
+> For browser-based project types where IDE launches browser instead of attaching to runtime. Adapters determined by project type, not runtime.
 
 | Project Type | VS Code Debugger Type | Extra Fields | Reference |
 |-------------|----------------------|--------------|-----------|
@@ -67,7 +67,7 @@ The skill assembles `launch.json` entries by combining **debugger properties** f
 
 > See [project-types/frontend-spa.md](../project-types/frontend-spa.md) for detection signals and framework table.
 
-The debug adapter is `chrome` (built-in JS Debugger). The request mode is `launch` (VS Code opens the browser).
+Debug adapter: `chrome` (built-in JS Debugger). Request mode: `launch` (VS Code opens browser).
 
 ```json
 {
@@ -84,10 +84,10 @@ The debug adapter is `chrome` (built-in JS Debugger). The request mode is `launc
 
 ## Build Configuration — `tasks.json`
 
-VS Code tasks are defined in `.vscode/tasks.json`. The skill builds a dependency chain with two kinds of tasks:
+Tasks defined in `.vscode/tasks.json`. Builds dependency chain with two task kinds:
 
 1. **Runtime build tasks** — install, clean, watch, build (commands from `runtimes/{rt}.md`, problem matchers from this file)
-2. **Project type top-level task** — the task that starts the application (e.g., `func host start`). This is the task that `preLaunchTask` in the launch configuration points to. It sits at the top of the chain and depends on the runtime build tasks.
+2. **Project type top-level task** — starts application (e.g., `func host start`). `preLaunchTask` points here. Sits atop chain, depends on runtime build tasks.
 
 ### Chain Shape
 
@@ -101,7 +101,7 @@ VS Code tasks are defined in `.vscode/tasks.json`. The skill builds a dependency
 
 ### Emulator Task
 
-This task is present only when emulators are required (i.e., when a `docker-compose.yml` is generated during Phase 1):
+Present only when emulators required (i.e., `docker-compose.yml` generated during Phase 1):
 
 ```json
 {
@@ -114,9 +114,9 @@ This task is present only when emulators are required (i.e., when a `docker-comp
 
 ### Runtime Task Reference
 
-> **To add a new runtime:** add a row here with VS Code-specific problem matchers, then create or update the corresponding `runtimes/{rt}.md` with the build commands and chain shape.
+> **To add new runtime:** add row here with VS Code problem matchers, then create/update corresponding `runtimes/{rt}.md` with build commands and chain shape.
 >
-> Build commands (install, clean, watch, build) are **not** listed here — they are runtime properties sourced from each `runtimes/{rt}.md` Build Chain section.
+> Build commands (install, clean, watch, build) **not** listed here — sourced from each `runtimes/{rt}.md` Build Chain section.
 
 | Runtime | Watch Problem Matcher | Build Problem Matcher | Status |
 |---------|----------------------|----------------------|--------|
@@ -127,23 +127,23 @@ This task is present only when emulators are required (i.e., when a `docker-comp
 | java | — | — | ⛔ Not yet implemented |
 | go | — | — | ⛔ Not yet implemented |
 
-> **Monorepo / alternative package managers:** Adjust task labels and commands as needed (e.g., `yarn`, `pnpm`, `gradle`). The key invariant is the chain shape: **install → clean → build/watch → top-level task**. Some runtimes skip clean or watch steps — use only what applies.
+> **Monorepo / alt package managers:** Adjust labels/commands as needed (e.g., `yarn`, `pnpm`, `gradle`). Key invariant: **install → clean → build/watch → top-level task**. Some runtimes skip clean or watch — use only what applies.
 
 ### Working Directory (`cwd`) Rules
 
-> ⚠️ **CRITICAL for multi-service repos.** Without correct `cwd`, commands like `npm install` or `func host start` will run from the workspace root and fail.
+> ⚠️ **CRITICAL for multi-service repos.** Without correct `cwd`, commands like `npm install` or `func host start` run from workspace root and fail.
 
 | Task Scope | `cwd` Setting | Example |
 |------------|--------------|---------|
 | **Per-service tasks** (install, clean, watch, build, top-level) | `"options": { "cwd": "${workspaceFolder}/{service-root}" }` | `"cwd": "${workspaceFolder}/api"` |
-| **Shared tasks** (Start Emulators) | Workspace root (omit `cwd` — it defaults to workspace root) | — |
-| **Single-service repos** | Omit `cwd` — workspace root is the service root | — |
+| **Shared tasks** (Start Emulators) | Workspace root (omit `cwd` — defaults to workspace root) | — |
+| **Single-service repos** | Omit `cwd` — workspace root is service root | — |
 
 ### Per Project Type: Azure Functions
 
-> See [project-types/functions.md](../project-types/functions.md) for startup command, request mode, and per-runtime notes. This subsection covers VS Code-specific rendering only. Standard `"type": "shell"` project types do not need a subsection — the generic chain shape above already covers them.
+> See [project-types/functions.md](../project-types/functions.md) for startup command, request mode, per-runtime notes. Covers VS Code-specific rendering only. Standard `"type": "shell"` project types need no subsection — generic chain shape above covers them.
 
-The top-level task uses the VS Code `func` task type provided by the Azure Functions extension. The launch configuration's `preLaunchTask` points to this task.
+Top-level task uses VS Code `func` task type from Azure Functions extension. `preLaunchTask` points to this task.
 
 | Runtime | Task Type | Problem Matcher | Status |
 |---------|-----------|----------------|--------|
@@ -179,13 +179,13 @@ The top-level task uses the VS Code `func` task type provided by the Azure Funct
 }
 ```
 
-> `dependsOn`: first entry is the runtime-specific prerequisite — watch task for TypeScript, install task for JavaScript. Include `"Start Emulators"` only when emulators are required.
+> `dependsOn`: first entry = runtime-specific prerequisite — watch task for TypeScript, install task for JavaScript. Include `"Start Emulators"` only when emulators required.
 
 ### Example: frontend SPA tasks
 
-> See [project-types/frontend-spa.md](../project-types/frontend-spa.md) for detection signals, framework table, and startup task label derivation.
+> See [project-types/frontend-spa.md](../project-types/frontend-spa.md) for detection signals, framework table, startup task label derivation.
 
-The top-level task is the framework's dev server (e.g., `npm run dev` for Vite). No runtime build chain — the dev server handles everything. The task label follows the pattern `"{id} dev"` (see [project-types/frontend-spa.md](../project-types/frontend-spa.md) Runtime Wiring).
+Top-level task = framework dev server (e.g., `npm run dev` for Vite). No runtime build chain — dev server handles everything. Task label pattern: `"{id} dev"` (see [project-types/frontend-spa.md](../project-types/frontend-spa.md) Runtime Wiring).
 
 ```json
 {
@@ -206,17 +206,16 @@ The top-level task is the framework's dev server (e.g., `npm run dev` for Vite).
 }
 ```
 
-> ⚠️ **IMPORTANT: Background tasks MUST have a real `problemMatcher`.**
-> Avoid `"problemMatcher": []` on a task with `"isBackground": true`.
-> An empty matcher causes VS Code to display a blocking dialog:
-> *"The task has not exited and doesn't have a 'problemMatcher' defined."*
-> Always use a framework-specific background matcher from [project-types/frontend-spa.md](../project-types/frontend-spa.md).
+> ⚠️ **IMPORTANT: Background tasks MUST have real `problemMatcher`.**
+> Avoid `"problemMatcher": []` on task with `"isBackground": true`.
+> Empty matcher causes VS Code blocking dialog: *"The task has not exited and doesn't have a 'problemMatcher' defined."*
+> Use framework-specific background matcher from [project-types/frontend-spa.md](../project-types/frontend-spa.md).
 
 ---
 
 ## Multi-Service / Compound Configuration
 
-> ⛔ **MANDATORY:** When 2+ service roots are detected (including Frontend SPA projects), a compound launch configuration **must** be generated.
+> ⛔ **MANDATORY:** When 2+ service roots detected (including Frontend SPA projects), compound launch configuration **must** be generated.
 
 ```json
 {
@@ -227,34 +226,34 @@ The top-level task is the framework's dev server (e.g., `npm run dev` for Vite).
 }
 ```
 
-One entry per service using its assigned ID from [multi-service.md](../multi-service.md).
+One entry per service using assigned ID from [multi-service.md](../multi-service.md).
 
-> ⚠️ `preLaunchTask` is **conditional**: include `"preLaunchTask": "Start Emulators"` only when emulators are required (i.e., the `"Start Emulators"` task exists in `tasks.json`). Omit the field entirely when no emulators are needed.
+> ⚠️ `preLaunchTask` **conditional**: include `"preLaunchTask": "Start Emulators"` only when emulators required (i.e., `"Start Emulators"` task exists in `tasks.json`). Omit field entirely when no emulators needed.
 
 ---
 
 ## Debug Configuration Checklist Validation
 
-> ⛔ **MANDATORY.** You MUST execute every step below for each launch configuration. Do NOT skip, assume, or approximate results. Do NOT proceed to the closing message until every checklist entry has a real ✅ or ❌ result.
+> ⛔ **MANDATORY.** Execute every step below for each launch config. Do NOT skip, assume, or approximate. Do NOT proceed to closing message until every checklist entry has real ✅ or ❌.
 
 For each **non-compound** launch configuration in `.vscode/launch.json`:
 
-1. Read the config's `preLaunchTask` value
-2. Trace the full `dependsOn` chain in `.vscode/tasks.json` to resolve the dependency order
-3. Run prerequisite tasks first (install, clean, emulators), then start the `preLaunchTask` itself as a background process
-4. If a `docker-compose.yml` was generated, verify all services started correctly after `docker compose up -d`. Long-running services (e.g., database emulators, Azurite) should be running and healthy; one-shot services (e.g., `db-migrate`) should have exited with code 0. Use `docker compose ps` and `docker compose logs <service>` to check. If any service failed, diagnose the issue, fix the configuration, and re-run until all services are healthy or exited cleanly. Only mark the config ❌ after exhausting reasonable fix attempts.
-5. Confirm the ready signal in stdout from the **top-level task**, for example:
+1. Read config's `preLaunchTask` value
+2. Trace full `dependsOn` chain in `.vscode/tasks.json` to resolve dependency order
+3. Run prerequisite tasks first (install, clean, emulators), then start `preLaunchTask` as background process
+4. If `docker-compose.yml` generated, verify all services started after `docker compose up -d`. Long-running services (e.g., database emulators, Azurite) should be running/healthy; one-shot services (e.g., `db-migrate`) should exit code 0. Use `docker compose ps` and `docker compose logs <service>` to check. If any failed, diagnose, fix, re-run until healthy/exited cleanly. Mark ❌ only after exhausting reasonable fix attempts.
+5. Confirm ready signal in stdout from **top-level task**:
    - Azure Functions host → `"Host lock lease acquired"` or `"Functions host started"`
    - Vite / webpack → `"ready in"` or `"Local:"`
    - Node HTTP server → `"listening on"` or `"Server running"`
-6. After the ready signal, confirm with `curl` using the **application HTTP port** (not the debug port):
-   - For `node`-type configs (Functions): `curl -s -o /dev/null -w "%{http_code}" http://localhost:7071/api/health` → expect `200` (port `7071` is the Functions host HTTP port; debug port `9229` is for the debugger only)
-   - For `chrome`-type configs (browser dev servers): `curl -s -o /dev/null -w "%{http_code}" http://localhost:<url port from launch config>` → expect `200` or `301`
-   - **Note:** For `chrome`-type configs you are validating that the dev server started and is reachable — you do NOT need to launch a browser. The `preLaunchTask` is a shell task (`npm run dev` / Vite) that runs in the terminal like any other.
-7. Kill background processes, then move to the next config
-8. For compound configs: skip running them; mark ✅ if all named member configs passed, ❌ if any failed
+6. After ready signal, confirm with `curl` using **application HTTP port** (not debug port):
+   - `node`-type configs (Functions): `curl -s -o /dev/null -w "%{http_code}" http://localhost:7071/api/health` → expect `200` (port `7071` = Functions host HTTP port; debug port `9229` = debugger only)
+   - `chrome`-type configs (browser dev servers): `curl -s -o /dev/null -w "%{http_code}" http://localhost:<url port from launch config>` → expect `200` or `301`
+   - **Note:** For `chrome`-type configs, validating dev server started and is reachable — no browser launch needed. `preLaunchTask` is shell task (`npm run dev` / Vite) running in terminal.
+7. Kill background processes, move to next config
+8. Compound configs: skip running; mark ✅ if all named member configs passed, ❌ if any failed
 
-**You MUST then edit the `## Debug Configuration Checklist` section in `.azure/local-development-plan.md`:**
+**Edit `## Debug Configuration Checklist` section in `.azure/local-development-plan.md`:**
 
 ```
 Debug Configuration Checklist:
@@ -262,14 +261,14 @@ Debug Configuration Checklist:
 ✅ <config-name> — <ready signal + curl result>
 ```
 
-One line per config (non-compound and compound). ✅ requires the ready signal observed AND curl confirmed.
+One line per config (non-compound and compound). ✅ requires ready signal observed AND curl confirmed.
 
-> ⛔ Do NOT set status to `Implemented` until every stub in the Debug Configuration Checklist has been replaced with a real ✅ or ❌ result. A checklist with any remaining stubs is incomplete — go back and validate.
+> ⛔ Do NOT set status to `Implemented` until every stub in Debug Configuration Checklist replaced with real ✅ or ❌. Checklist with remaining stubs = incomplete — go back and validate.
 
 ---
 
 ## Quick Start
 
-After Phase 3 validation, include this in the closing message:
+After Phase 3 validation, include in closing message:
 
-> Press **F5** in VS Code and select **Start All** to launch the full application with debugging.
+> Press **F5** in VS Code and select **Start All** to launch full application with debugging.

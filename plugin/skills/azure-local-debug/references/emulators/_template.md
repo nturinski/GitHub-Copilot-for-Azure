@@ -1,12 +1,12 @@
 # {Emulator Name}
 
-> **Template** — Copy this file to `emulators/{name}.md` when adding a new emulator.
+> **Template** — Copy to `emulators/{name}.md` for new emulator.
 
 ---
 
 ## Docker Image
 
-<!-- Official image and recommended pinned tag. -->
+<!-- Official image + recommended pinned tag. -->
 
 ```
 {org}/{image}:{tag}
@@ -14,7 +14,7 @@
 
 ## docker-compose Service Block
 
-<!-- Complete service YAML block, ready to paste. Includes ports, volumes, health check. -->
+<!-- Complete service YAML block, paste-ready. Includes ports, volumes, health check. -->
 
 ```yaml
 services:
@@ -29,7 +29,7 @@ services:
 
 ## Connection String
 
-<!-- Default local connection string for the app to use. -->
+<!-- Default local connection string. -->
 
 ```
 {connection-string}
@@ -37,7 +37,7 @@ services:
 
 ## Required App Environment Variables
 
-<!-- Variable names the app must set to point at this emulator. -->
+<!-- Vars app must set to reach this emulator. -->
 
 | Variable | Value |
 |----------|-------|
@@ -45,10 +45,8 @@ services:
 
 ## Healthcheck (Database Emulators Only)
 
-<!-- If this emulator is a database, include a healthcheck block in the docker-compose service above AND document it here. The migration service (see migrations.md) depends on `condition: service_healthy` to wait for the database before running migrations. Without a healthcheck, auto-migration will not work. -->
-
-<!-- Delete this section if the emulator is not a database. -->
+<!-- For DB emulators: include healthcheck in docker-compose block above + document here. Migration service (migrations.md) uses `condition: service_healthy` to wait before running migrations. No healthcheck = no auto-migration. Delete section if not DB emulator. -->
 
 ## Notes
 
-<!-- Platform caveats (arm64/x86), known issues, resource requirements. -->
+<!-- Platform caveats (arm64/x86), known issues, resource reqs. -->

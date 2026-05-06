@@ -1,10 +1,10 @@
 # Plan Template
 
-Create `.azure/local-development-plan.md` using this template. This file is **mandatory** and serves as the source of truth for the entire local development setup workflow.
+Create `.azure/local-development-plan.md` using this template. **Mandatory** source of truth for local development setup.
 
 ## ⛔ BLOCKING REQUIREMENT
 
-You **MUST** create this plan file BEFORE generating any configuration files. Present the plan to the user and get approval before proceeding to execution.
+**MUST** create plan file BEFORE generating any config files. Present plan to user and get approval before execution.
 
 ---
 
@@ -288,16 +288,16 @@ Debug Configuration Checklist:
 
 ## Instructions
 
-1. **Create the plan first** — Fill in all sections based on scan results
-2. **Update the Table of Contents** — Replace each summary row with one sentence describing the actual detected configuration (e.g., emulator names, database type, port numbers)
-3. **Be specific** — Use actual detected versions, ports, connection strings, function names
-4. **Include docker-compose snippets** — Each emulator gets a collapsible YAML block; the full `docker-compose.yml` combines them all
-5. **Number emulators sequentially** — Use `### 1.`, `### 2.`, etc. for each emulator subsection
-6. **Omit Migrations if not applicable** — Only include the Migrations section when database migrations are detected
-7. **Present to user** — Show the plan and ask for approval
-8. **Track status** — Update the **Status** field at the top as you progress. Only set status to `Implemented` after the Debug Configuration Checklist has been filled in with real validation results.
-9. **Fill in the Validation section** — During Phase 3, replace each ❌ stub in the Debug Configuration Checklist with a ✅ or ❌ and the observed result. Do NOT set status to `Implemented` until every stub has been replaced.
-10. **Set Created timestamp** — When first writing the plan, set **Created** to the current UTC datetime in ISO 8601 format (e.g. `2026-03-27T20:08:48Z`). This field must never be changed after initial creation.
-11. **Update Last Updated timestamp** — Set **Last Updated** to the current UTC datetime in ISO 8601 format every time the Status field changes (Planning → Approved → Executing → Implemented) or any other edit is made to the plan.
+1. **Create plan first** — Fill all sections from scan results
+2. **Update Table of Contents** — Replace each summary row with one sentence describing detected config (emulator names, database type, ports)
+3. **Be specific** — Use detected versions, ports, connection strings, function names
+4. **Include docker-compose snippets** — Each emulator gets collapsible YAML block; full `docker-compose.yml` combines them
+5. **Number emulators sequentially** — Use `### 1.`, `### 2.`, etc.
+6. **Omit Migrations if N/A** — Only include when database migrations detected
+7. **Present to user** — Show plan, ask for approval
+8. **Track status** — Update **Status** field as you progress. Only set `Implemented` after Debug Configuration Checklist filled with real validation results.
+9. **Fill in Validation section** — Phase 3: replace each ❌ stub in Debug Configuration Checklist with ✅ or ❌ and observed result. Do NOT set `Implemented` until every stub replaced.
+10. **Set Created timestamp** — Set **Created** to current UTC datetime in ISO 8601 format (e.g. `2026-03-27T20:08:48Z`). Never change after initial creation.
+11. **Update Last Updated timestamp** — Set **Last Updated** to current UTC ISO 8601 datetime on every Status change (Planning → Approved → Executing → Implemented) or any plan edit.
 
-The plan is the **single source of truth** for the execution phase.
+Plan is **single source of truth** for execution phase.

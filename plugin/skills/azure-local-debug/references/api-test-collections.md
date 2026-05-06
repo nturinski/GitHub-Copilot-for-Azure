@@ -1,12 +1,12 @@
 # API Test Collection Patterns
 
-> Reference for generating `api-test-collections/local-development/` scripts. Scripts should be language-agnostic commands that exercise the running app and test its integration with any live emulators.
+> Reference for generating `api-test-collections/local-development/` scripts. Language-agnostic commands exercising running app + live emulators.
 
 ---
 
 ## HTTP
 
- **HTTP patterns** use `{baseUrl}` — the project type supplies the base URL (e.g., `http://localhost:7071/api` for Functions). All other patterns target the emulator directly and are reusable across project types.
+HTTP patterns use `{baseUrl}` — project type supplies base URL (e.g., `http://localhost:7071/api` for Functions). Other patterns target emulator directly, reusable across project types.
 
 ### GET request
 
@@ -36,7 +36,7 @@ curl -i -X POST "{baseUrl}/{FunctionName}" \
 
 ## Storage (Azurite — Blob / Queue / Table)
 
-> Requires Azurite running. Uses `--connection-string "UseDevelopmentStorage=true"` for all commands.
+> Requires Azurite running. All commands use `--connection-string "UseDevelopmentStorage=true"`.
 
 ### Blob trigger — upload a file
 
@@ -74,7 +74,7 @@ az storage entity insert \
 
 ## Cosmos DB
 
-> Requires Cosmos DB Emulator running on `https://localhost:8081`. TLS verification must be disabled for local calls.
+> Requires Cosmos DB Emulator on `https://localhost:8081`. Disable TLS verification for local calls.
 
 ### Insert a document
 
@@ -88,13 +88,13 @@ curl -k -X POST "https://localhost:8081/dbs/{database}/colls/{collection}/docs" 
   -d '{"id": "test-001", "partitionKey": "test", "data": "sample"}'
 ```
 
-> `-k` disables TLS verification for the emulator's self-signed cert. Never use in production.
+> `-k` disables TLS verification for emulator self-signed cert. Never use in production.
 
 ---
 
 ## Service Bus
 
-> Requires Service Bus Emulator running. Uses the `az servicebus` CLI or the Service Bus REST API.
+> Requires Service Bus Emulator running. Uses `az servicebus` CLI or Service Bus REST API.
 
 ### Send a message to a queue
 
@@ -136,7 +136,7 @@ az eventhubs eventhub message send \
 
 ## Timer (Azure Functions only)
 
-Timer triggers cannot be fired by an external event — the Functions host fires them on schedule. Use the Functions admin API to trigger them on demand:
+Timer triggers can't fire externally — Functions host fires on schedule. Use Functions admin API for on-demand trigger:
 
 ```sh
 #!/bin/bash
@@ -145,7 +145,7 @@ curl -i -X POST "http://localhost:7071/admin/functions/{FunctionName}" \
   -d '{}'
 ```
 
-> This calls the Functions admin endpoint which is only available locally. The `{}` body is required; the timer trigger ignores it.
+> Calls Functions admin endpoint, only available locally. `{}` body required; timer trigger ignores it.
 
 ---
 
@@ -153,19 +153,19 @@ curl -i -X POST "http://localhost:7071/admin/functions/{FunctionName}" \
 
 When generating `api-test-collections/local-development/` during Phase 2:
 
-1. Generate one subdirectory per trigger/endpoint found during inventory
-2. Name the directory after the trigger: `{trigger-type}-{function-or-endpoint-name}` (e.g., `http-GetOrder`, `blob-ProcessUpload`)
-3. Create `invoke.sh` with the appropriate pattern from this file, substituting discovered values (function name, container name, queue name, etc.)
-4. Create a `sample-data.json` or `sample-message.json` next to `invoke.sh` when the test requires a body
+1. One subdirectory per trigger/endpoint found during inventory
+2. Name directory after trigger: `{trigger-type}-{function-or-endpoint-name}` (e.g., `http-GetOrder`, `blob-ProcessUpload`)
+3. Create `invoke.sh` with appropriate pattern from this file, substituting discovered values (function name, container name, queue name, etc.)
+4. Create `sample-data.json` or `sample-message.json` next to `invoke.sh` when test requires body
 5. `chmod +x invoke.sh`
 
-> **Do not generate timer test scripts** unless the user explicitly requests it — they're rarely needed for local debugging.
+> **Skip timer test scripts** unless user explicitly requests — rarely needed for local debugging.
 
 ---
 
 ## Plan Section Formatting Rules
 
-When writing the **API Test Collections** section of the plan, the heading format may vary by trigger type. In all cases, the subfolder names under `api-test-collections/local-development/` (e.g., `http-register`, `http-createOrder`) should also be referenced in each section's markdown heading when they differ so users can easily see which routes map to each invokable script.
+In **API Test Collections** plan section, heading format varies by trigger type. Subfolder names under `api-test-collections/local-development/` (e.g., `http-register`, `http-createOrder`) must appear in each section's markdown heading so users see which routes map to which script.
 
 ---
 
@@ -175,9 +175,9 @@ When writing the **API Test Collections** section of the plan, the heading forma
 ### {METHOD} {route} [{🔒}] `{folder-name}`
 ```
 
-- **`{METHOD} {route}`** — HTTP verb and full route path (e.g., `GET /api/health`)
-- **`🔒`** — Include this emoji when the endpoint requires authentication (any auth scheme: Bearer JWT, API key, etc.). Omit entirely for anonymous/public endpoints.
-- **`` `{folder-name}` ``** — The exact folder name under `api-test-collections/local-development/` (e.g., `` `http-health` ``)
+- **`{METHOD} {route}`** — HTTP verb + full route path (e.g., `GET /api/health`)
+- **`🔒`** — Include when endpoint requires auth (Bearer JWT, API key, etc.). Omit for anonymous/public endpoints.
+- **`` `{folder-name}` ``** — Exact folder name under `api-test-collections/local-development/` (e.g., `` `http-health` ``)
 
 **Examples:**
 
@@ -191,7 +191,7 @@ When writing the **API Test Collections** section of the plan, the heading forma
 ### POST /api/orders 🔒 `http-createOrder`
 ```
 
-**Auth key** — add this once at the top of the API Test Collections section, just after the folder tree, when any 🔒 routes are present:
+**Auth key** — add once atop API Test Collections section, after folder tree, when any 🔒 routes exist:
 
 ```markdown
 > 🔒 = requires authentication (replace `<token>` with a JWT from the login endpoint before running)
@@ -205,9 +205,9 @@ When writing the **API Test Collections** section of the plan, the heading forma
 ### {TriggerType}: {function-or-resource-name} `{folder-name}`
 ```
 
-- **`{TriggerType}`** — Human-readable trigger category: `Blob`, `Queue`, `Service Bus`, `Event Hubs`, `Table`, `Cosmos DB`, etc.
-- **`{function-or-resource-name}`** — The function name or the specific resource being targeted (container name, queue name, topic name, etc.)
-- **`` `{folder-name}` ``** — The exact folder name under `api-test-collections/local-development/` (e.g., `` `blob-ProcessUpload` ``)
+- **`{TriggerType}`** — Trigger category: `Blob`, `Queue`, `Service Bus`, `Event Hubs`, `Table`, `Cosmos DB`, etc.
+- **`{function-or-resource-name}`** — Function name or targeted resource (container, queue, topic name, etc.)
+- **`` `{folder-name}` ``** — Exact folder name under `api-test-collections/local-development/` (e.g., `` `blob-ProcessUpload` ``)
 
 **Examples:**
 
@@ -221,4 +221,4 @@ When writing the **API Test Collections** section of the plan, the heading forma
 ### Event Hubs: telemetry `eventhubs-sendTelemetry`
 ```
 
-> The 🔒 indicator does not apply to non-HTTP triggers — they are invoked by pushing data into the resource directly, not via an authenticated HTTP call.
+> 🔒 indicator doesn't apply to non-HTTP triggers — invoked by pushing data into resource directly, not via authenticated HTTP call.
