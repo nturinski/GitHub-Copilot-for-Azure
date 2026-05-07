@@ -90,7 +90,7 @@ Detect via workspace inference (P2 rules) or ask with a structured option prompt
 
 ## Hand-Off Contract
 
-When ready to deploy (after `azure-localdev`):
+When ready to deploy (after `azure-local-debug`):
 
 1. `azure-prepare` reads `.azure/project-plan.md` (Sections 4 + 4a)
 2. Runtime Essentials + included Baseline + User-Selected become its initial service inventory — no re-asking

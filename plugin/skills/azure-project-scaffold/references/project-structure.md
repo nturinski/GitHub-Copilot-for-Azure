@@ -9,8 +9,7 @@
 ```
 project-root/
 ├── .azure/
-│   ├── project-plan.md
-│   └── execution-checklist.md     ← created during scaffold
+│   └── project-plan.md
 ├── .env.example
 ├── .gitignore
 ├── package.json                    ← Root workspace config
@@ -111,6 +110,6 @@ This skill is **infra-aware but IaC-free**. It declares deployment intent in `.a
 | `Dockerfile` (any component) | `azure-prepare` |
 | `.github/workflows/*.yml` (deployment pipelines) | `azure-prepare` |
 | `.azure/deployment-plan.md` | `azure-prepare` |
-| `docker-compose.yml`, IDE debugger launch config (e.g., `.vscode/launch.json`) | `azure-localdev` |
+| `docker-compose.yml`, IDE debugger launch config (e.g., `.vscode/launch.json`) | `azure-local-debug` |
 
 `azure-prepare` reads `.azure/project-plan.md` Section 4a (Required Resources + User-Selected Resources) as its initial service inventory \u2014 see [azure-services-catalog.md](azure-services-catalog.md) for the bridge contract.

@@ -1,6 +1,6 @@
 ---
 name: azure-project-scaffold
-description: "Plan and scaffold a NEW Azure-centric project end-to-end: gather requirements, write `.azure/project-plan.md`, REQUIRE explicit user approval, then generate a live frontend preview the user can edit while the backend scaffolds in a parallel subagent. PREFER OVER azure-prepare when the user wants a NEW project from scratch (azure-prepare ships existing code). WHEN: \"plan project\", \"design app\", \"new project\", \"project requirements\", \"create project plan\", \"scaffold project\", \"new Azure app\", \"create testable app\", \"new API project\", \"full-stack Azure app\", \"scaffold backend\", \"build services\", \"execute plan\", \"create backend\", \"implement plan\", \"wire frontend\", \"create API\", \"preview frontend\", \"bootstrap project\". DO NOT USE FOR: shipping existing codebases to Azure (use azure-prepare), authoring Bicep/Terraform for already-built apps (use azure-prepare), Docker emulators / IDE debugger launch (use azure-localdev), test coverage (use azure-project-verify)."
+description: "Plan and scaffold a NEW Azure-centric project end-to-end: gather requirements, write `.azure/project-plan.md`, REQUIRE explicit user approval, then generate a live frontend preview the user can edit while the backend scaffolds in a parallel subagent. PREFER OVER azure-prepare when the user wants a NEW project from scratch (azure-prepare ships existing code). WHEN: \"plan project\", \"design app\", \"new project\", \"project requirements\", \"create project plan\", \"scaffold project\", \"new Azure app\", \"create testable app\", \"new API project\", \"full-stack Azure app\", \"scaffold backend\", \"build services\", \"execute plan\", \"create backend\", \"implement plan\", \"wire frontend\", \"create API\", \"preview frontend\", \"bootstrap project\". DO NOT USE FOR: shipping existing codebases to Azure (use azure-prepare), authoring Bicep/Terraform for already-built apps (use azure-prepare), Docker emulators / IDE debugger launch (use azure-local-debug)."
 license: MIT
 metadata:
   author: Microsoft
@@ -19,31 +19,29 @@ Approved plan fast → live frontend preview the user can edit → backend scaff
 
 | User Intent | Correct Skill |
 |-------------|---------------|
-| Docker Compose, emulators, IDE debugger launch | **azure-localdev** |
-| Add test coverage to scaffolded project | **azure-project-verify** |
+| Docker Compose, emulators, IDE debugger launch | **azure-local-debug** |
 | Deploy to Azure | **azure-prepare** |
 | Generate Bicep, Terraform, `azure.yaml`, Dockerfiles | **azure-prepare** |
 | Benchmark scaffold quality | **scaffold-benchmark** |
 
 ## Rules
 
-> 15 rules. Rule 0 = plan-approval gate, the most important.
+> 14 rules. Rule 0 = plan-approval gate, the most important.
 
 0. **PLAN-FIRST GATE — NO CODE BEFORE APPROVAL.** Only `.azure/project-plan.md` allowed before approval. Do NOT create `src/`, `package.json`, configs, or any scaffold files until plan `Status:` = `Approved`. Acceptable: yes / approved / looks good / proceed. Anything else (silence, "looks fine but…", revision request) = **revise + re-ask**. Violation = scaffold failure; only recovery = delete generated files and re-ask.
-1. **Plan = source of truth** — Read `.azure/project-plan.md` at start of Phase 2. Follow routes/services/types/architecture exactly. Do NOT re-ask requirements.
-2. **Track progress** — Copy plan Section 9 into `.azure/execution-checklist.md`. Mark `[ ]`→`[x]` per step. Update plan status: Approved → In Progress → Scaffolded → Ready. Step 12 verifies all items checked.
-3. **Build-gate** — Every phase ends with `tsc` / `npm run build`. Iterate until clean. Do NOT proceed until code compiles.
-4. **Azure Functions v4 (current scaffold target)** — v4 model (Node.js v4, .NET 10 isolated). Functions v4 is the only template implemented today; Container Apps / App Service not yet templated. Currently scaffolds **TypeScript (Node.js)** and **C# (.NET 10)**.
-5. **Service abstraction & DI** — All Azure SDK calls behind injectable interfaces. Handlers NEVER import SDKs directly. **Step 3 MUST produce interface AND concrete impl per service.** Interface-only = #1 cause of runtime crashes. See [../shared-references/service-abstraction.md](../shared-references/service-abstraction.md).
-6. **One function per file** — Each Function in own file; each service own module. Shared utilities → `src/utils/`. Prefix unused params `_`. Same helper in 2+ files → extract. See [../shared-references/architecture.md](../shared-references/architecture.md).
-7. **Env-driven config** — Connection strings switch local/Azure via env vars. Validate required vars on startup; fail fast.
-8. **Input validation + standardized errors** — Every endpoint has validation schema (Zod / FluentValidation). Every route returns `{ error: { code, message, details? } }`. Error codes typed union. See [../shared-references/error-handling.md](../shared-references/error-handling.md).
-9. **Resilience classification** — Follow plan's Essential/Enhancement classification. Enhancement services wrapped in try/catch + fallback. Enhancement constructors MUST NOT throw. See [../shared-references/resilience.md](../shared-references/resilience.md).
-10. **Database integrity** — Migrations MUST include UNIQUE, FK (ON DELETE), CHECK, INDEX. Multi-table writes use transactions. Collection-to-table mappings documented. See [../shared-references/database-integrity.md](../shared-references/database-integrity.md).
-11. **Wire frontend to real types** — If preview generated, replace mock types with shared imports + mock client with real typed client. Verify build. No `any` types.
-12. **Auto-init** — Registry `getServices()` MUST auto-init concrete impls when nothing pre-registered. Runtime smoke test owned by `azure-project-verify`.
-13. **Cross-workspace build safety** — When Functions imports `../shared/`, set `rootDir` to `".."` and **compute `main` field from actual `dist/` output after `tsc`** — never hardcode. #1 cause of "build passes but app won't start".
-14. **Infra-aware, IaC-free** — Declare deployment intent in plan **Section 4a** so `azure-prepare` can consume. NEVER create `infra/`, `azure.yaml`, `*.bicep`, `*.tf`, `Dockerfile`, or deployment workflows. See [references/azure-services-catalog.md](references/azure-services-catalog.md).
+1. **Plan = source of truth** — Read `.azure/project-plan.md` at start of Phase 2. Follow routes/services/types/architecture exactly. Do NOT re-ask requirements. Update plan `Status:` Approved → In Progress → Scaffolded as work proceeds.
+2. **Build-gate** — Every phase ends with runtime's build/compile command (e.g., `tsc` / `npm run build` for Node, `dotnet build` for .NET). Iterate until clean. Do NOT proceed until code compiles.
+3. **Azure Functions v4 (current scaffold target)** — v4 model (Node.js v4, .NET 10 isolated). Functions v4 is the only template implemented today; Container Apps / App Service not yet templated. Currently scaffolds **TypeScript (Node.js)** and **C# (.NET 10)**.
+4. **Service abstraction & DI** — All Azure SDK calls behind injectable interfaces. Handlers NEVER import SDKs directly. **Step 3 MUST produce interface AND concrete impl per service.** Interface-only = #1 cause of runtime crashes. See [../shared-references/service-abstraction.md](../shared-references/service-abstraction.md).
+5. **One function per file** — Each Function in own file; each service own module. Shared utilities → `src/utils/`. Prefix unused params `_`. Same helper in 2+ files → extract. See [../shared-references/architecture.md](../shared-references/architecture.md).
+6. **Env-driven config** — Connection strings switch local/Azure via env vars. Validate required vars on startup; fail fast.
+7. **Input validation + standardized errors** — Every endpoint has validation schema (Zod / FluentValidation). Every route returns `{ error: { code, message, details? } }`. Error codes typed union. See [../shared-references/error-handling.md](../shared-references/error-handling.md).
+8. **Resilience classification** — Follow plan's Essential/Enhancement classification. Enhancement services wrapped in try/catch + fallback. Enhancement constructors MUST NOT throw. See [../shared-references/resilience.md](../shared-references/resilience.md).
+9. **Database integrity** — Migrations MUST include UNIQUE, FK (ON DELETE), CHECK, INDEX. Multi-table writes use transactions. Collection-to-table mappings documented. See [../shared-references/database-integrity.md](../shared-references/database-integrity.md).
+10. **Wire frontend to real types** — If preview generated, replace mock types with shared imports + mock client with real typed client. Verify build. No `any` types.
+11. **Auto-init** — Registry `getServices()` MUST auto-init concrete impls when nothing pre-registered.
+12. **Cross-workspace build safety** — When Functions imports shared code from a sibling/parent workspace, configure the build to include those sources (e.g., expand the source root) and **derive the entry point from the actual build output** — never hardcode paths. #1 cause of "build passes but app won't start".
+13. **Infra-aware, IaC-free** — Declare deployment intent in plan **Section 4a** so `azure-prepare` can consume. NEVER create `infra/`, `azure.yaml`, `*.bicep`, `*.tf`, `Dockerfile`, or deployment workflows. See [references/azure-services-catalog.md](references/azure-services-catalog.md).
 
 ## Workflow
 
@@ -55,7 +53,7 @@ PHASE 1 — PLAN (main)
   P4: ⛔ APPROVAL GATE ⛔ → revise loop → Status: Approved
 
 PHASE 2 — SCAFFOLD
-  Step 0:    Re-validate plan, copy checklist, Status → In Progress
+  Step 0:    Re-validate plan, Status → In Progress
   Step 0.5:  Frontend preview + edit loop (main)        ┐
   Phase A:   Contracts (sequential, main)               ┤
   Phase B:   Backend (SUBAGENT, async)                  ┤
@@ -78,7 +76,7 @@ PHASE 2 — SCAFFOLD
 | **P1, P2, P4** | _(inline)_ |
 | **P3** Plan | [plan-template](references/plan-template.md), [project-structure](references/project-structure.md), [azure-services-catalog](references/azure-services-catalog.md) |
 | **Step 0** | `.azure/project-plan.md` |
-| **Step 0.5** Preview | [frontend-patterns](references/frontend-patterns.md), [frontend-preview-steps](references/frontend-preview-steps.md) |
+| **Step 0.5** Preview | [frontend-patterns](references/frontend-patterns.md), [frontend-preview-steps](references/frontend-preview-steps.md), selected runtime \u2014 Frontend Patterns section |
 | **Phase A/B** | [sub-agent-strategy](references/sub-agent-strategy.md) |
 | **Step 1** Foundation | [architecture](../shared-references/architecture.md), [project-structure](references/project-structure.md) |
 | **Step 2** Config | [service-abstraction](../shared-references/service-abstraction.md) — Config Module |
@@ -216,17 +214,16 @@ Use a **structured option prompt** (interactive quick-pick UI). Never plain-text
 
 ## PHASE 2: SCAFFOLD
 
-### Step 0: Re-validate Plan & Init Tracking
+### Step 0: Re-validate Plan
 
 | Task | Detail |
 |------|--------|
 | Re-read plan | Confirm Status = `Approved`. Else STOP and return to Phase 1. |
 | Extract details | Routes, services, entities, frontend, runtime, structure. |
 | Frontend needed? | If plan includes frontend (SPA + API, Full-stack SSR, Static + API), Step 0.5 generates preview. |
-| Copy checklist | Plan Section 9 → `.azure/execution-checklist.md`. |
 | Status | Set to `In Progress`. |
 
-> **✅** Plan loaded, Status `In Progress`, checklist created.
+> **✅** Plan loaded, Status `In Progress`.
 
 ---
 
@@ -265,7 +262,7 @@ Project skeleton compiles with zero errors.
 
 **Ref**: [../shared-references/architecture.md](../shared-references/architecture.md)
 
-> **✅** (1) Build zero errors. (2) Every workspace has `build` script; if produces `dist/`, verify non-empty. (3) Shared package `package.json` has `"exports"` or `"main"` → compiled output. (4) `tsc --noEmit` in every workspace importing shared; fix `TS2307`. (5) After `tsc`, list `dist/`, confirm `main` glob matches handlers.
+> **✅** (1) Build zero errors. (2) Every workspace has a build command; if it produces compiled output, verify non-empty. (3) Shared package exports its compiled output via the runtime's standard mechanism (e.g., `package.json` `"exports"`/`"main"` for Node, project reference for .NET). (4) Type-check each workspace that imports shared; fix unresolved-module errors. (5) After build, list the output directory and confirm the entry-point pattern matches handlers.
 
 ---
 
@@ -300,7 +297,7 @@ One module per Azure service: injectable interface + concrete impl.
 
 > 📋 Per service: `src/services/interfaces/I{Service}Service.ts` (interface), `src/services/{service}.ts` (concrete impl), `src/services/registry.ts` (`initializeServices()` constructs concrete instances), `getServices()` calls `initializeServices()` lazily.
 
-> **✅** Interfaces, concrete impls, registry exist. `tsc` zero errors.
+> **✅** Interfaces, concrete impls, registry exist. Build/type-check zero errors.
 
 ---
 
@@ -355,16 +352,16 @@ For **each** route:
 |------|--------|
 | Function handler | One file per function. All async calls MUST `await`. Standardized `handleError`. |
 | Multi-table writes | Use `database.transaction()` |
-| Enhancement services | Try/catch + fallback (Rule 9) |
+| Enhancement services | Try/catch + fallback (Rule 8) |
 | File uploads | Server-side size + MIME validation |
 | Path params | Validate before DB queries (e.g., UUID format — malformed ID on typed column = 500 not 401) |
 | Response shape | Match Route Definitions |
-| Collection names | Map to migration tables (Rule 10) |
+| Collection names | Map to migration tables (Rule 9) |
 | Shared utilities | Duplicates → `src/functions/src/utils/` |
 
 **Ref**: [../shared-references/service-abstraction.md](../shared-references/service-abstraction.md), [../shared-references/resilience.md](../shared-references/resilience.md)
 
-> **✅ Post-Step 6 Build Gate**: (1) `npm run build` / `tsc` zero errors. (2) Verify `main` field — list `dist/`, confirm glob matches handlers. Runtime smoke testing (`func start`) owned by `azure-project-verify`.
+> **✅ Post-Step 6 Build Gate**: (1) Build zero errors. (2) Verify the entry-point pattern — list the build output directory and confirm it matches handlers.
 
 ---
 
@@ -422,7 +419,7 @@ Global error handler for consistent responses.
 
 **Ref**: [../shared-references/runtimes/](../shared-references/runtimes/)
 
-> **✅** Logger configured. `tsc` zero errors.
+> **✅** Logger configured. Build/type-check zero errors.
 
 ---
 
@@ -453,13 +450,12 @@ Replace mock data/types in preview with real shared types + typed API client.
 
 | Task | Detail |
 |------|--------|
-| Build all workspaces | `npm run build` everywhere — zero errors |
-| Update checklist | Mark `[x]` in `.azure/execution-checklist.md` (Rule 2). >50% unchecked = NOT complete. |
+| Build all workspaces | Run the runtime's build/compile command in every workspace — zero errors |
 | Plan status | Set to `Scaffolded` |
 | Print completion | List created files, announce **"Scaffolding complete!"** |
-| **Suggest next steps** | MANDATORY structured option prompt. Do NOT auto-invoke.<br>**Header**: "Next Step"<br>**Options** (allowFreeformInput: false):<br>- **"Verify project"** ("Add tests + runtime validation incl. `func start` smoke test") — recommended<br>- **"Set up local dev"** ("Docker emulators + IDE debugger")<br>- **"Prepare for deployment"** ("Generate IaC + `azure.yaml`")<br>Routes to: `azure-project-verify` / `azure-localdev` / `azure-prepare` (reads plan **Section 4a**). |
+| **Suggest next steps** | MANDATORY structured option prompt. Do NOT auto-invoke.<br>**Header**: "Next Step"<br>**Options** (allowFreeformInput: false):<br>- **"Set up local dev"** ("Docker emulators + IDE debugger") — recommended<br>- **"Prepare for deployment"** ("Generate IaC + `azure.yaml`")<br>Routes to: `azure-local-debug` / `azure-prepare` (reads plan **Section 4a**). |
 
-> **✅ Final**: build clean; checklist 100%; plan Status = `Scaffolded`; follow-up prompt presented. Runtime smoke testing owned by `azure-project-verify`.
+> **✅ Final**: build clean; plan Status = `Scaffolded`; follow-up prompt presented.
 
 ---
 
@@ -468,7 +464,6 @@ Replace mock data/types in preview with real shared types + typed API client.
 | Artifact | Location |
 |----------|----------|
 | **Project Plan** | `.azure/project-plan.md` (Planning → Approved → In Progress → Scaffolded) |
-| **Execution Checklist** | `.azure/execution-checklist.md` |
 | Frontend preview / wired | `src/web/` (mock data → real client) |
 | Backend (Functions) | `src/functions/` |
 | Shared types + schemas | `src/shared/`, `src/shared/schemas/` |

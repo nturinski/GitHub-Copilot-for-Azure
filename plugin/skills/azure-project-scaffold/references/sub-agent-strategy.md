@@ -48,8 +48,6 @@ Once contracts exist on disk, **launch a subagent via `runSubagent`** to do all 
 
 > **Why subagent**: keeps the main thread responsive so the user can request frontend tweaks (text changes, layout edits, color swaps) while the backend scaffold runs uninterrupted.
 
-> **NOTE**: Testing is NOT part of scaffold phase. Test infrastructure, mocks, fixtures, unit tests, and the `func start` runtime smoke test are generated and executed by `azure-project-verify`, invoked after scaffolding completes (Step 12).
-
 ### Subagent Handoff Prompt
 
 When invoking `runSubagent` for Phase B, include in the `prompt`:
@@ -58,7 +56,7 @@ When invoking `runSubagent` for Phase B, include in the `prompt`:
 2. **Contracts already created** (Phase A output paths) — list each file the subagent must NOT recreate or modify.
 3. **Scope**: implement Steps 3–10 from `skills/azure-project-scaffold/SKILL.md`.
 4. **Reference files** subagent must consult lazily per the Step-to-Reference table in SKILL.md.
-5. **Build gates**: every step must compile. Runtime smoke testing (`func start` + health check) is owned by `azure-project-verify` and is NOT part of the subagent's scope.
+5. **Build gates**: every step must compile.
 6. **Return contract**: subagent's final message MUST report (a) files created, (b) build result, (c) any unresolved blockers.
 
 ---
