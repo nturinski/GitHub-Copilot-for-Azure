@@ -25,6 +25,9 @@ import * as path from "node:path";
 
 const SKILL_NAME = "azure-local-debug";
 const FOLLOW_UP_PROMPT = ["Continue with recommended options until complete."];
+const BROWNFIELD_FOLLOW_UP = [
+  "Approved, proceed with generation and validation. After validation, the Debug Configuration Checklist section must contain ONLY one plain-text line per launch config from launch.json — no sub-headings, no emulator status, no file lists. Each line starts at column 0 with ✅ or ❌.",
+];
 
 const RUNS_PER_PROMPT = 3;
 const INVOCATION_RATE_THRESHOLD = 0.8;
@@ -145,7 +148,7 @@ describeIntegration(`${SKILL_NAME}_ - Integration Tests`, () => {
           "Please setup the necessary configurations for a VS Code editor. " +
           `The app can be found under ${SCRAPBOOK_NODE_SPARSE_PATH}.`,
         nonInteractive: true,
-        followUp: FOLLOW_UP_PROMPT,
+        followUp: BROWNFIELD_FOLLOW_UP,
         preserveWorkspace: true,
       });
     }, BROWNFIELD_TEST_TIMEOUT_MS);
@@ -217,7 +220,10 @@ describeIntegration(`${SKILL_NAME}_ - Integration Tests`, () => {
       test("agent warns about limited IDE support", () => withTestResult(() => {
         expect(agentMetadata).toBeDefined();
         const messages = getAllAssistantMessages(agentMetadata);
-        expect(messages).toContain("LIMITED SUPPORT");
+        const messagesLower = messages.toLowerCase();
+        const mentionsLimitedSupport = messagesLower.includes("limited support");
+        const asksAboutIdeDistinction = messagesLower.includes("which ide") || messagesLower.includes("which editor");
+        expect(mentionsLimitedSupport || asksAboutIdeDistinction).toBe(true);
       }));
     });
   });

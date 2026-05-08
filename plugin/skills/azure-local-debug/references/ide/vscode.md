@@ -234,7 +234,9 @@ One entry per service using assigned ID from [multi-service.md](../multi-service
 
 ## Debug Configuration Checklist Validation
 
-> ⛔ **MANDATORY.** Execute every step below for each launch config. Do NOT skip, assume, or approximate. Do NOT proceed to closing message until every checklist entry has real ✅ or ❌.
+> ⛔ **MANDATORY — THIS IS THE MOST IMPORTANT STEP.** You must execute real commands in the terminal for each launch config. "Validation" does NOT mean checking that files exist or that JSON is valid. It means actually starting the server process, observing stdout output, and curling the HTTP endpoint.
+>
+> ⚠️ **Common failure mode:** Agents often skip this step or fake results by writing "✅ READY" or "✅ VALIDATED" without running anything. This is the #1 cause of test failures. You MUST run real terminal commands.
 
 For each **non-compound** launch configuration in `.vscode/launch.json`:
 
@@ -255,15 +257,18 @@ For each **non-compound** launch configuration in `.vscode/launch.json`:
 
 **Edit `## Debug Configuration Checklist` section in `.azure/local-development-plan.md`:**
 
+> ⚠️ **FORMAT IS CRITICAL — use plain text, NOT markdown tables.** Each line must start with ✅ or ❌ at column 0. Do NOT use `| column |` table syntax.
+
 ```
-Debug Configuration Checklist:
-✅ <config-name> — <ready signal + curl result>
-✅ <config-name> — <ready signal + curl result>
+✅ <config-name> — <ready signal observed> + curl <status code>
+❌ <config-name> — <failure description>
 ```
 
-One line per config (non-compound and compound). ✅ requires ready signal observed AND curl confirmed.
+One line per config (non-compound and compound). ✅ requires ready signal observed AND curl confirmed. Replace every `⬜ PENDING` stub — any remaining stubs mean validation is incomplete.
 
-> ⛔ Do NOT set status to `Implemented` until every stub in Debug Configuration Checklist replaced with real ✅ or ❌. Checklist with remaining stubs = incomplete — go back and validate.
+> ⛔ Do NOT set status to `Implemented` until every `⬜ PENDING` stub in Debug Configuration Checklist replaced with real ✅ or ❌. Remaining stubs = incomplete — go back and validate.
+> 
+> 🛑 **SELF-CHECK before proceeding:** Count the `⬜ PENDING` entries remaining. If count > 0, you are not done. Execute the missing validations now.
 
 ---
 

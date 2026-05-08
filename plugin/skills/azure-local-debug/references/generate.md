@@ -74,3 +74,7 @@ ask_user(
 ### Reactive (When Containers Fail at Runtime)
 
 If containers fail after generation — or user reports unhealthy container / docker compose errors — re-run port scan, follow same protocol above.
+
+---
+
+> ⚠️ **Generation is NOT the final step.** After all artifacts are written, you MUST proceed to Phase 3 validation. Do NOT deliver a closing message, set status to `Implemented`, or summarize results until every Debug Configuration Checklist entry has been validated with real terminal output. The user is waiting for validation results — generation alone is incomplete.

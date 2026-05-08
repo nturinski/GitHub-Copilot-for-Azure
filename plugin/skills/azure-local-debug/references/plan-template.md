@@ -273,14 +273,38 @@ curl -i {url}
 
 ## Debug Configuration Checklist
 
-> **Managed in Phase 3 by the Agent — replace each ❌ with a real terminal run result.**
+> ⛔ **VALIDATION REQUIRED — Phase 3 must replace every stub below with real terminal output.**
+>
+> Each `⬜ PENDING` entry is a canary — the agent MUST run the config's preLaunchTask in the terminal, observe real stdout output, curl the HTTP endpoint, and replace the stub. If ANY `⬜ PENDING` entries remain, validation is incomplete and status MUST NOT be set to `Implemented`.
+>
+> ⚠️ **"Validated" means you ran the actual process in a terminal and observed real output.** Creating config files is NOT validation. Checking JSON syntax is NOT validation. You must start the actual server process, see it print a ready signal, and curl its HTTP endpoint.
+
+> **FORMAT RULE — MANDATORY (no tables, no markdown tables)**
+>
+> Use this EXACT plain-text format. One line per config. Lines MUST start with ✅ or ❌ at column 0. Do NOT use markdown tables (`| col |`). Do NOT indent. Do NOT use any other format.
 
 ```
-Debug Configuration Checklist:
-❌ {config-name} — Not yet validated
+⬜ PENDING — {config-name} — Not yet validated
 ```
 
-<!-- After running each config's startup commands in the terminal, replace ❌ with ✅ and the ready signal observed (e.g. "Host lock lease acquired", "ready in 312ms"). One line per config. Do NOT mark ✅ without having actually run the commands. -->
+> After validation, each line should look exactly like:
+>
+> `✅ {config-name} — {ready signal observed} + curl {status code}`
+>
+> Or on failure: `❌ {config-name} — {failure reason}`
+
+<!-- Phase 3 instructions:
+  For EACH config above:
+  1. Run the config's full startup chain in the terminal — execute every prerequisite step (install dependencies, start emulators, build) then start the application process itself
+  2. Wait for and observe the ready signal in stdout (e.g. "Host lock lease acquired", "ready in 312ms")
+  3. Curl the HTTP endpoint and record the status code (e.g. curl -s -o /dev/null -w "%{http_code}" http://localhost:7071/api/health)
+  4. Replace the ⬜ PENDING line with: ✅ {config-name} — {ready signal} + curl {status code}
+     OR: ❌ {config-name} — {failure reason}
+  5. Do NOT mark ✅ without having actually run the commands and observed real output.
+  6. Creating config files is NOT validation. You must run the actual process.
+  7. Do NOT set status to Implemented until ZERO ⬜ PENDING entries remain.
+  8. Compound configs: mark ✅ if all member configs passed, ❌ if any failed. No process to run.
+-->
 
 ````
 
@@ -288,16 +312,17 @@ Debug Configuration Checklist:
 
 ## Instructions
 
-1. **Create plan first** — Fill all sections from scan results
-2. **Update Table of Contents** — Replace each summary row with one sentence describing detected config (emulator names, database type, ports)
-3. **Be specific** — Use detected versions, ports, connection strings, function names
-4. **Include docker-compose snippets** — Each emulator gets collapsible YAML block; full `docker-compose.yml` combines them
-5. **Number emulators sequentially** — Use `### 1.`, `### 2.`, etc.
-6. **Omit Migrations if N/A** — Only include when database migrations detected
-7. **Present to user** — Show plan, ask for approval
-8. **Track status** — Update **Status** field as you progress. Only set `Implemented` after Debug Configuration Checklist filled with real validation results.
-9. **Fill in Validation section** — Phase 3: replace each ❌ stub in Debug Configuration Checklist with ✅ or ❌ and observed result. Do NOT set `Implemented` until every stub replaced.
-10. **Set Created timestamp** — Set **Created** to current UTC datetime in ISO 8601 format (e.g. `2026-03-27T20:08:48Z`). Never change after initial creation.
-11. **Update Last Updated timestamp** — Set **Last Updated** to current UTC ISO 8601 datetime on every Status change (Planning → Approved → Executing → Implemented) or any plan edit.
+1. **Preserve `##` section headers exactly** — Do NOT number, rename, or restructure the `##`-level headings. They are parsed by tooling. Only `### ` sub-headings under Emulators may be numbered.
+2. **Create plan first** — Fill all sections from scan results
+3. **Update Table of Contents** — Replace each summary row with one sentence describing detected config (emulator names, database type, ports)
+4. **Be specific** — Use detected versions, ports, connection strings, function names
+5. **Include docker-compose snippets** — Each emulator gets collapsible YAML block; full `docker-compose.yml` combines them
+6. **Number emulators sequentially** — Use `### 1.`, `### 2.`, etc.
+7. **Omit Migrations if N/A** — Only include when database migrations detected
+8. **Present to user** — Show plan, ask for approval
+9. **Track status** — Update **Status** field as you progress. Only set `Implemented` after Debug Configuration Checklist has ZERO `⬜ PENDING` entries remaining — every entry must show real ✅ or ❌ with observed terminal output.
+10. **Fill in Validation section** — Phase 3: replace each `⬜ PENDING` stub in Debug Configuration Checklist with ✅ or ❌ and observed result. Count remaining `⬜ PENDING` entries — if count > 0, validation is incomplete. Do NOT set `Implemented` until count = 0.
+11. **Set Created timestamp** — Set **Created** to current UTC datetime in ISO 8601 format (e.g. `2026-03-27T20:08:48Z`). Never change after initial creation.
+12. **Update Last Updated timestamp** — Set **Last Updated** to current UTC ISO 8601 datetime on every Status change (Planning → Approved → Executing → Implemented) or any plan edit.
 
 Plan is **single source of truth** for execution phase.

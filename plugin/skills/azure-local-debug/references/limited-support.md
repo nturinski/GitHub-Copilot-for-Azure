@@ -85,17 +85,17 @@ When **any** limited-support items exist, `## Limited Support` section in `.azur
 
 ## Example
 
-User prompt: *"Set up this app for debugging with Visual Studio."*
+User prompt: *"Set up this app for debugging with JetBrains."*
 
-1. Classify IDE → canonical ID: `jet-brains`
-2. Check: does `references/ide/jet-brains.md` exist? **No** → limited support
+1. Classify IDE → canonical ID: `jetbrains`
+2. Check: does `references/ide/jetbrains.md` exist? **No** → limited support
 3. Emit in assistant message:
    ```
-   ⚠️ LIMITED SUPPORT: IDE "Jet Brains" is not yet fully supported.
+   ⚠️ LIMITED SUPPORT: IDE "JetBrains" is not yet fully supported.
    ```
 4. Call `ask_user` to confirm (first occurrence)
 5. Add to plan `## Limited Support` section:
 
    | Category | Value | Impact |
    |----------|-------|--------|
-   | IDE | Jet Brains | No IDE-specific debug/launch configuration reference available. Best-effort configuration will be generated. |
+   | IDE | JetBrains | No IDE-specific debug/launch configuration reference available. Best-effort configuration will be generated. |

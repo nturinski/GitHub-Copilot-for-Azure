@@ -71,15 +71,15 @@ Determine target IDE for workspace. IDE applies to entire workspace, not per-ser
 
 Normalize user's IDE reference to **canonical ID** using this table. These are **different products** — do NOT treat one as shorthand for another.
 
-| User says | Canonical ID | Maps to | Reference |
-|-----------|-------------|---------|-----------|
-| "VS Code", "VSCode", "Visual Studio Code", "Code" | `vscode` | **VS Code** | [ide/vscode.md](ide/vscode.md) |
-| "Visual Studio", "VS" (without "Code") | `visual-studio` | **Visual Studio** | [limited-support.md](limited-support.md) |
-| Other | — | — | [limited-support.md](limited-support.md) |
+| User says | Canonical ID | Maps to | Action |
+|-----------|-------------|---------|--------|
+| "VS Code", "VSCode", "Visual Studio Code", "Code" | `vscode` | **VS Code** | Load [ide/vscode.md](ide/vscode.md) |
+| "Visual Studio", "VS" (without "Code") | `visual-studio` | **Visual Studio** | ⚠️ Emit `LIMITED SUPPORT` warning — [limited-support.md](limited-support.md) |
+| Other | — | — | ⚠️ Emit `LIMITED SUPPORT` warning — [limited-support.md](limited-support.md) |
 
-> ⛔ **"Visual Studio" ≠ "VS Code".** Different IDEs. If user says "Visual Studio" or "VS", MUST classify as `visual-studio`, NOT `vscode`. Misclassifying IDE violates this rule.
+> ⛔ **"Visual Studio" ≠ "VS Code".** Different IDEs. If user says "Visual Studio" or "VS", MUST classify as `visual-studio`, NOT `vscode`. Do NOT ask the user to confirm or suggest VS Code instead — accept their stated IDE as-is. Misclassifying or second-guessing the user's IDE violates this rule.
 
-After normalizing, check whether `references/ide/{canonical-id}.md` exists. If not, IDE has **limited support** — MUST follow [limited-support.md](limited-support.md) emission protocol before proceeding. Do NOT silently fall back to supported IDE.
+After normalizing, check whether `references/ide/{canonical-id}.md` exists. If not, IDE has **limited support** — your **very first line** of the next assistant message MUST be `⚠️ LIMITED SUPPORT: IDE "{ide-name}" is not yet fully supported.` Then follow [limited-support.md](limited-support.md) emission protocol. Do NOT silently fall back to supported IDE.
 
 ---
 
